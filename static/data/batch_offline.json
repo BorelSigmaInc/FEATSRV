@@ -1,0 +1,165 @@
+[
+  {
+    "entity_id": "CLM-00104",
+    "entity_type": "claim",
+    "claim_amount": 1520.63,
+    "fraud_flag": 0,
+    "policy_id": "POL-0288"
+  },
+  {
+    "entity_id": "POL-0047",
+    "entity_type": "policy",
+    "initial_premium": 1184.12,
+    "region": "AR"
+  },
+  {
+    "entity_id": "CLM-00389",
+    "entity_type": "claim",
+    "claim_amount": 1126.1,
+    "fraud_flag": 0,
+    "policy_id": "POL-0304"
+  },
+  {
+    "entity_id": "POL-0049",
+    "entity_type": "policy",
+    "initial_premium": 614.25,
+    "region": "WY"
+  },
+  {
+    "entity_id": "CLM-00367",
+    "entity_type": "claim",
+    "claim_amount": 921.07,
+    "fraud_flag": 0,
+    "policy_id": "POL-0482"
+  },
+  {
+    "entity_id": "POL-0433",
+    "entity_type": "policy",
+    "initial_premium": 471.91,
+    "region": "TX"
+  },
+  {
+    "entity_id": "CLM-00352",
+    "entity_type": "claim",
+    "claim_amount": 827.58,
+    "fraud_flag": 0,
+    "policy_id": "POL-0062"
+  },
+  {
+    "entity_id": "POL-0309",
+    "entity_type": "policy",
+    "initial_premium": 760.41,
+    "region": "MD"
+  },
+  {
+    "entity_id": "CLM-00270",
+    "entity_type": "claim",
+    "claim_amount": 413.37,
+    "fraud_flag": 0,
+    "policy_id": "POL-0251"
+  },
+  {
+    "entity_id": "POL-0413",
+    "entity_type": "policy",
+    "initial_premium": 1274.84,
+    "region": "PR"
+  },
+  {
+    "entity_id": "CLM-00044",
+    "entity_type": "claim",
+    "claim_amount": 439.19,
+    "fraud_flag": 0,
+    "policy_id": "POL-0409"
+  },
+  {
+    "entity_id": "POL-0373",
+    "entity_type": "policy",
+    "initial_premium": 1461.11,
+    "region": "PR"
+  },
+  {
+    "entity_id": "CLM-00470",
+    "entity_type": "claim",
+    "claim_amount": 1026.48,
+    "fraud_flag": 0,
+    "policy_id": "POL-0239"
+  },
+  {
+    "entity_id": "POL-0274",
+    "entity_type": "policy",
+    "initial_premium": 1169.28,
+    "region": "NV"
+  },
+  {
+    "entity_id": "CLM-00127",
+    "entity_type": "claim",
+    "claim_amount": 731.3,
+    "fraud_flag": 0,
+    "policy_id": "POL-0279"
+  },
+  {
+    "entity_id": "POL-0498",
+    "entity_type": "policy",
+    "initial_premium": 1956.47,
+    "region": "MP"
+  },
+  {
+    "entity_id": "CLM-00944",
+    "entity_type": "claim",
+    "claim_amount": 3982.36,
+    "fraud_flag": 0,
+    "policy_id": "POL-0280"
+  },
+  {
+    "entity_id": "POL-0193",
+    "entity_type": "policy",
+    "initial_premium": 1376.27,
+    "region": "OR"
+  },
+  {
+    "entity_id": "CLM-00080",
+    "entity_type": "claim",
+    "claim_amount": 1796.96,
+    "fraud_flag": 0,
+    "policy_id": "POL-0011"
+  },
+  {
+    "entity_id": "POL-0282",
+    "entity_type": "policy",
+    "initial_premium": 938.49,
+    "region": "MD"
+  },
+  {
+    "entity_id": "CLM-00300",
+    "entity_type": "claim",
+    "claim_amount": 2255.12,
+    "fraud_flag": 0,
+    "policy_id": "POL-0451"
+  },
+  {
+    "entity_id": "POL-0424",
+    "entity_type": "policy",
+    "initial_premium": 397.85,
+    "region": "ME"
+  },
+  {
+    "entity_id": "CLM-00643",
+    "entity_type": "claim",
+    "claim_amount": 646.81,
+    "fraud_flag": 0,
+    "policy_id": "POL-0170"
+  },
+  {
+    "entity_id": "POL-0316",
+    "entity_type": "policy",
+    "initial_premium": 995.22,
+    "region": "NV"
+  },
+  {
+    "entity_id": "CLM-00906",
+    "entity_type": "claim",
+    "claim_amount": 617.12,
+    "fraud_flag": 0,
+    "policy_id": "POL-0074"
+  }
+]

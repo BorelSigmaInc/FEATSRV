@@ -1,0 +1,142 @@
+[
+  {
+    "timestamp": "2026-08-30T00:00:00",
+    "service": "feature-importance",
+    "entity": "CLM-00325",
+    "status": 200,
+    "latency": 67
+  },
+  {
+    "timestamp": "2026-08-24T00:00:00",
+    "service": "pit-training",
+    "entity": "CLM-00047",
+    "status": 200,
+    "latency": 150
+  },
+  {
+    "timestamp": "2026-08-23T00:00:00",
+    "service": "online/policy",
+    "entity": "CLM-00368",
+    "status": 200,
+    "latency": 124
+  },
+  {
+    "timestamp": "2026-08-21T00:00:00",
+    "service": "online/policy",
+    "entity": "CLM-00313",
+    "status": 200,
+    "latency": 62
+  },
+  {
+    "timestamp": "2026-08-19T00:00:00",
+    "service": "feature-importance",
+    "entity": "CLM-00839",
+    "status": 200,
+    "latency": 289
+  },
+  {
+    "timestamp": "2026-08-19T00:00:00",
+    "service": "pit-training",
+    "entity": "CLM-00319",
+    "status": 200,
+    "latency": 226
+  },
+  {
+    "timestamp": "2026-08-18T00:00:00",
+    "service": "pit-training",
+    "entity": "CLM-00254",
+    "status": 200,
+    "latency": 25
+  },
+  {
+    "timestamp": "2026-08-17T00:00:00",
+    "service": "pit-training",
+    "entity": "CLM-00734",
+    "status": 200,
+    "latency": 121
+  },
+  {
+    "timestamp": "2026-08-16T00:00:00",
+    "service": "online/policy",
+    "entity": "CLM-00108",
+    "status": 200,
+    "latency": 268
+  },
+  {
+    "timestamp": "2026-08-14T00:00:00",
+    "service": "leakage-audit",
+    "entity": "CLM-00073",
+    "status": 200,
+    "latency": 23
+  },
+  {
+    "timestamp": "2026-08-14T00:00:00",
+    "service": "leakage-audit",
+    "entity": "CLM-00473",
+    "status": 200,
+    "latency": 111
+  },
+  {
+    "timestamp": "2026-08-13T00:00:00",
+    "service": "feature-importance",
+    "entity": "CLM-00420",
+    "status": 200,
+    "latency": 289
+  },
+  {
+    "timestamp": "2026-08-12T00:00:00",
+    "service": "offline",
+    "entity": "CLM-00351",
+    "status": 200,
+    "latency": 122
+  },
+  {
+    "timestamp": "2026-08-12T00:00:00",
+    "service": "offline",
+    "entity": "CLM-00670",
+    "status": 200,
+    "latency": 152
+  },
+  {
+    "timestamp": "2026-08-11T00:00:00",
+    "service": "health",
+    "entity": "CLM-00107",
+    "status": 200,
+    "latency": 13
+  },
+  {
+    "timestamp": "2026-08-11T00:00:00",
+    "service": "health",
+    "entity": "CLM-00999",
+    "status": 200,
+    "latency": 91
+  },
+  {
+    "timestamp": "2026-08-09T00:00:00",
+    "service": "feature-importance",
+    "entity": "CLM-00815",
+    "status": 200,
+    "latency": 226
+  },
+  {
+    "timestamp": "2026-08-09T00:00:00",
+    "service": "online/claim",
+    "entity": "CLM-00631",
+    "status": 200,
+    "latency": 152
+  },
+  {
+    "timestamp": "2026-08-09T00:00:00",
+    "service": "online/policy",
+    "entity": "CLM-00687",
+    "status": 200,
+    "latency": 120
+  },
+  {
+    "timestamp": "2026-08-08T00:00:00",
+    "service": "health",
+    "entity": "CLM-00830",
+    "status": 200,
+    "latency": 182
+  }
+]

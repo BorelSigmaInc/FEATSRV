@@ -1,0 +1,272 @@
+[
+  {
+    "claim_id": "CLM-00000",
+    "policy_id": "POL-0227",
+    "event_timestamp": "2025-09-04T00:00:00",
+    "initial_premium": 968.27,
+    "address": "848 Melissa Bypass",
+    "claim_amount": 460.94,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00001",
+    "policy_id": "POL-0199",
+    "event_timestamp": "2025-08-22T00:00:00",
+    "initial_premium": 1625.79,
+    "address": "22847 Forbes Summit Suite 074",
+    "claim_amount": 8638.93,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00002",
+    "policy_id": "POL-0020",
+    "event_timestamp": "2025-09-18T00:00:00",
+    "initial_premium": 1340.15,
+    "address": "63669 Phillips Field Suite 726",
+    "claim_amount": 5516.76,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00003",
+    "policy_id": "POL-0010",
+    "event_timestamp": "2026-01-09T00:00:00",
+    "initial_premium": 334.99,
+    "address": "15727 Blackwell Inlet Suite 325",
+    "claim_amount": 509.01,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00004",
+    "policy_id": "POL-0316",
+    "event_timestamp": "2026-07-23T00:00:00",
+    "initial_premium": 995.22,
+    "address": "95837 Hill Isle",
+    "claim_amount": 760.05,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00005",
+    "policy_id": "POL-0375",
+    "event_timestamp": "2026-02-25T00:00:00",
+    "initial_premium": 842.26,
+    "address": "67455 Jason Brook Apt. 111",
+    "claim_amount": 2330.84,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00006",
+    "policy_id": "POL-0020",
+    "event_timestamp": "2026-02-25T00:00:00",
+    "initial_premium": 1340.15,
+    "address": "63669 Phillips Field Suite 726",
+    "claim_amount": 6711.61,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00007",
+    "policy_id": "POL-0361",
+    "event_timestamp": "2026-01-23T00:00:00",
+    "initial_premium": 1393.59,
+    "address": "860 Patterson Ports Suite 690",
+    "claim_amount": 780.55,
+    "fraud_flag": 1
+  },
+  {
+    "claim_id": "CLM-00008",
+    "policy_id": "POL-0472",
+    "event_timestamp": "2025-05-06T00:00:00",
+    "initial_premium": 373.37,
+    "address": "2380 Holmes Turnpike",
+    "claim_amount": 1212.98,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00009",
+    "policy_id": "POL-0364",
+    "event_timestamp": "2025-09-06T00:00:00",
+    "initial_premium": 1900.49,
+    "address": "36047 Duncan Street Suite 895",
+    "claim_amount": 839.09,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00010",
+    "policy_id": "POL-0076",
+    "event_timestamp": "2024-10-20T00:00:00",
+    "initial_premium": 1611.16,
+    "address": "239 Robertson Lock",
+    "claim_amount": 60.86,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00011",
+    "policy_id": "POL-0173",
+    "event_timestamp": "2026-03-02T00:00:00",
+    "initial_premium": 685.04,
+    "address": "58958 John Street Apt. 743",
+    "claim_amount": 5620.82,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00012",
+    "policy_id": "POL-0394",
+    "event_timestamp": "2025-08-21T00:00:00",
+    "initial_premium": 879.37,
+    "address": "39896 Brown Drive Suite 696",
+    "claim_amount": 7007.26,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00013",
+    "policy_id": "POL-0302",
+    "event_timestamp": "2025-05-17T00:00:00",
+    "initial_premium": 1219.08,
+    "address": "09286 Morgan Fork Apt. 552",
+    "claim_amount": 339.59,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00014",
+    "policy_id": "POL-0456",
+    "event_timestamp": "2025-09-13T00:00:00",
+    "initial_premium": 319.3,
+    "address": "7943 Rodney Lake",
+    "claim_amount": 389.96,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00015",
+    "policy_id": "POL-0326",
+    "event_timestamp": "2025-11-26T00:00:00",
+    "initial_premium": 1242.4,
+    "address": "52068 Silva Ranch Apt. 361",
+    "claim_amount": 7691.65,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00016",
+    "policy_id": "POL-0227",
+    "event_timestamp": "2026-06-13T00:00:00",
+    "initial_premium": 968.27,
+    "address": "848 Melissa Bypass",
+    "claim_amount": 1375.03,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00017",
+    "policy_id": "POL-0241",
+    "event_timestamp": "2025-02-12T00:00:00",
+    "initial_premium": 1921.68,
+    "address": "3803 Savannah Shoals Suite 977",
+    "claim_amount": 3999.17,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00018",
+    "policy_id": "POL-0328",
+    "event_timestamp": "2025-05-19T00:00:00",
+    "initial_premium": 1013.32,
+    "address": "61153 Mark Overpass",
+    "claim_amount": 5345.81,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00019",
+    "policy_id": "POL-0237",
+    "event_timestamp": "2025-12-14T00:00:00",
+    "initial_premium": 341.34,
+    "address": "6350 Vasquez Trace Apt. 203",
+    "claim_amount": 1835.63,
+    "fraud_flag": 1
+  },
+  {
+    "claim_id": "CLM-00020",
+    "policy_id": "POL-0414",
+    "event_timestamp": "2025-07-22T00:00:00",
+    "initial_premium": 1374.12,
+    "address": "6305 Melissa Stream Apt. 048",
+    "claim_amount": 1001.3,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00021",
+    "policy_id": "POL-0467",
+    "event_timestamp": "2025-12-23T00:00:00",
+    "initial_premium": 1776.62,
+    "address": "067 Henderson Rue Apt. 207",
+    "claim_amount": 857.18,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00022",
+    "policy_id": "POL-0044",
+    "event_timestamp": "2024-11-26T00:00:00",
+    "initial_premium": 739.93,
+    "address": "217 Murphy Mall",
+    "claim_amount": 765.78,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00023",
+    "policy_id": "POL-0031",
+    "event_timestamp": "2025-02-23T00:00:00",
+    "initial_premium": 589.89,
+    "address": "852 Jennifer Mountain Suite 558",
+    "claim_amount": 4092.07,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00024",
+    "policy_id": "POL-0184",
+    "event_timestamp": "2026-05-18T00:00:00",
+    "initial_premium": 738.5,
+    "address": "444 Amanda Trail Apt. 427",
+    "claim_amount": 681.28,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00025",
+    "policy_id": "POL-0485",
+    "event_timestamp": "2026-05-23T00:00:00",
+    "initial_premium": 1831.97,
+    "address": "06574 Bruce Underpass Suite 742",
+    "claim_amount": 1035.5,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00026",
+    "policy_id": "POL-0312",
+    "event_timestamp": "2026-06-22T00:00:00",
+    "initial_premium": 343.1,
+    "address": "2575 Lopez Squares",
+    "claim_amount": 1153.12,
+    "fraud_flag": 1
+  },
+  {
+    "claim_id": "CLM-00027",
+    "policy_id": "POL-0105",
+    "event_timestamp": "2025-09-26T00:00:00",
+    "initial_premium": 723.8,
+    "address": "104 Eric Drive Suite 406",
+    "claim_amount": 3197.13,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00028",
+    "policy_id": "POL-0045",
+    "event_timestamp": "2024-12-25T00:00:00",
+    "initial_premium": 1426.29,
+    "address": "51511 Moreno Summit Suite 782",
+    "claim_amount": 942.16,
+    "fraud_flag": 0
+  },
+  {
+    "claim_id": "CLM-00029",
+    "policy_id": "POL-0379",
+    "event_timestamp": "2025-06-26T00:00:00",
+    "initial_premium": 779.15,
+    "address": "1147 Brianna Burgs",
+    "claim_amount": 11.55,
+    "fraud_flag": 0
+  }
+]
