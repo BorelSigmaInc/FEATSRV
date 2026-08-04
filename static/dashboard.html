@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FEATSRV — Feature Serving Console</title>
+<style>
+
+/* ============================================================
+   FEATSRV CONSOLE — DESIGN TOKENS
+   House style: IBM Carbon Design System (Borel Sigma Inc. standard)
+   Palette (strict, four-color + status pair):
+     --blue-60   #0f62fe   primary / interactive
+     --gray-100  #161616   shell / dark surface
+     --gray-10   #f4f4f4   light surface
+     --white     #ffffff   inverse text / panels
+     --green-40  #24a148   status: healthy / positive delta
+     --red-50    #da1e28   status: risk / negative delta
+   Type: IBM Plex Sans (UI), IBM Plex Mono (data, ids, code)
+   Radius: 0 everywhere. No decorative icons — labels and glyphs only.
+   ============================================================ */
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: local('IBM Plex Sans');
+}
+
+:root {
+  --blue-60: #0f62fe;
+  --blue-70: #0043ce;
+  --blue-20: #d0e2ff;
+  --gray-100: #161616;
+  --gray-90: #262626;
+  --gray-80: #393939;
+  --gray-70: #525252;
+  --gray-60: #6f6f6f;
+  --gray-50: #8d8d8d;
+  --gray-30: #c6c6c6;
+  --gray-20: #e0e0e0;
+  --gray-10: #f4f4f4;
+  --white: #ffffff;
+  --green-40: #24a148;
+  --green-10: #defbe6;
+  --red-50: #da1e28;
+  --red-10: #fff1f1;
+
+  --font-ui: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+
+  --sp-01: 2px;
+  --sp-02: 4px;
+  --sp-03: 8px;
+  --sp-04: 12px;
+  --sp-05: 16px;
+  --sp-06: 24px;
+  --sp-07: 32px;
+  --sp-08: 40px;
+  --sp-09: 48px;
+  --sp-10: 64px;
+  --sp-11: 96px;
+
+  --border: 1px solid var(--gray-20);
+  --border-dark: 1px solid var(--gray-70);
+  --dur: 110ms;
+  --ease: cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--white);
+  color: var(--gray-100);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+a { color: var(--blue-60); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+:focus-visible {
+  outline: 2px solid var(--blue-60);
+  outline-offset: 2px;
+}
+
+::selection { background: var(--blue-20); }
+
+/* ------------------------------------------------------------
+   TOP SHELL
+   ------------------------------------------------------------ */
+.shell-header {
+  height: 48px;
+  background: var(--gray-100);
+  color: var(--white);
+  display: flex;
+  align-items: stretch;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--gray-80);
+}
+
+.shell-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-03);
+  padding: 0 var(--sp-05);
+  border-right: 1px solid var(--gray-80);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.shell-brand .mark {
+  width: 16px;
+  height: 16px;
+  background: var(--blue-60);
+  display: inline-block;
+  position: relative;
+  flex-shrink: 0;
+}
+.shell-brand .mark::after {
+  content: "";
+  position: absolute;
+  left: 4px; top: 4px; right: 4px; bottom: 4px;
+  background: var(--gray-100);
+}
+
+.shell-crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+  padding: 0 var(--sp-05);
+  color: var(--gray-30);
+  font-size: 13px;
+  overflow: hidden;
+}
+.shell-crumbs .sep { color: var(--gray-60); }
+.shell-crumbs .current { color: var(--white); }
+
+.shell-meta {
+  margin-left: auto;
+  display: flex;
+  align-items: stretch;
+}
+
+.shell-meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+  padding: 0 var(--sp-05);
+  border-left: 1px solid var(--gray-80);
+  font-size: 12px;
+  color: var(--gray-30);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-40);
+  flex-shrink: 0;
+  position: relative;
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--green-40);
+  opacity: 0.5;
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .status-dot::after { animation: none; }
+}
+
+/* ------------------------------------------------------------
+   PAGE HEADER
+   ------------------------------------------------------------ */
+.page-header {
+  background: var(--gray-100);
+  color: var(--white);
+  padding: var(--sp-08) var(--sp-09) var(--sp-07);
+}
+
+.page-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--sp-07);
+  flex-wrap: wrap;
+}
+
+.page-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--blue-20);
+  margin-bottom: var(--sp-03);
+  display: block;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  max-width: 760px;
+}
+.page-title b { font-weight: 600; }
+
+.page-sub {
+  margin-top: var(--sp-04);
+  color: var(--gray-30);
+  font-size: 15px;
+  max-width: 620px;
+  font-weight: 300;
+}
+
+.page-header-side {
+  display: flex;
+  gap: var(--sp-06);
+  padding-bottom: var(--sp-01);
+}
+
+.side-stat { text-align: right; }
+.side-stat .num {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--white);
+  display: block;
+  line-height: 1.1;
+}
+.side-stat .lbl {
+  font-size: 11px;
+  color: var(--gray-50);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: var(--sp-01);
+  display: block;
+}
+
+/* ------------------------------------------------------------
+   LAYOUT
+   ------------------------------------------------------------ */
+.wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--sp-09);
+}
+
+@media (max-width: 900px) {
+  .wrap, .page-header-inner { padding-left: var(--sp-05); padding-right: var(--sp-05); }
+  .page-header { padding-left: var(--sp-05); padding-right: var(--sp-05); }
+}
+
+/* ------------------------------------------------------------
+   KPI ROW
+   ------------------------------------------------------------ */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: var(--border);
+  border-top: none;
+  margin-top: -1px;
+}
+
+.kpi-card {
+  padding: var(--sp-06) var(--sp-06);
+  border-right: var(--border);
+  position: relative;
+  transition: background var(--dur) var(--ease);
+}
+.kpi-card:last-child { border-right: none; }
+.kpi-card:hover { background: var(--gray-10); }
+
+.kpi-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-60);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-02);
+}
+
+.kpi-value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 500;
+  margin-top: var(--sp-03);
+  color: var(--gray-100);
+}
+
+.kpi-delta {
+  margin-top: var(--sp-03);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-02);
+  padding: 2px 6px;
+}
+.kpi-delta.up { color: var(--green-40); background: var(--green-10); }
+.kpi-delta.down { color: var(--red-50); background: var(--red-10); }
+.kpi-delta.flat { color: var(--gray-60); background: var(--gray-10); }
+
+@media (max-width: 900px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ------------------------------------------------------------
+   TABS
+   ------------------------------------------------------------ */
+.tabbar {
+  display: flex;
+  border-bottom: 1px solid var(--gray-30);
+  overflow-x: auto;
+  margin-top: var(--sp-07);
+}
+
+.tab-btn {
+  font-family: var(--font-ui);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--sp-04) var(--sp-05);
+  font-size: 14px;
+  color: var(--gray-70);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.tab-btn:hover { color: var(--gray-100); background: var(--gray-10); }
+.tab-btn.active {
+  color: var(--gray-100);
+  border-bottom-color: var(--blue-60);
+  font-weight: 500;
+}
+.tab-btn .tab-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--gray-50);
+  margin-right: var(--sp-02);
+}
+
+.tab-panel { display: none; padding: var(--sp-07) 0 var(--sp-10); animation: fade-in 180ms var(--ease); }
+.tab-panel.active { display: block; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tab-panel { animation: none; } }
+
+/* ------------------------------------------------------------
+   CARDS / SECTIONS
+   ------------------------------------------------------------ */
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--sp-05);
+  gap: var(--sp-04);
+  flex-wrap: wrap;
+}
+.section-heading h2 {
+  font-size: 20px;
+  font-weight: 500;
+}
+.section-heading .desc {
+  font-size: 13px;
+  color: var(--gray-60);
+  max-width: 560px;
+}
+.section-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gray-50);
+}
+
+.card {
+  border: var(--border);
+  background: var(--white);
+}
+
+.card-header {
+  padding: var(--sp-05) var(--sp-05);
+  border-bottom: var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-03);
+}
+.card-header h3 { font-size: 15px; font-weight: 500; }
+.card-header .card-sub { font-size: 12px; color: var(--gray-60); margin-top: 2px; }
+.card-body { padding: var(--sp-05); }
+
+.grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--sp-06); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-06); }
+@media (max-width: 1000px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+.stack { display: flex; flex-direction: column; gap: var(--sp-06); }
+
+/* ------------------------------------------------------------
+   TAGS / BADGES / BUTTONS
+   ------------------------------------------------------------ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.tag.blue { color: var(--blue-70); background: var(--blue-20); border-color: transparent; }
+.tag.green { color: var(--green-40); background: var(--green-10); border-color: transparent; }
+.tag.red { color: var(--red-50); background: var(--red-10); border-color: transparent; }
+.tag.gray { color: var(--gray-70); background: var(--gray-10); border-color: transparent; }
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  border: none;
+  padding: 10px 16px;
+  background: var(--blue-60);
+  color: var(--white);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background var(--dur) var(--ease);
+}
+.btn:hover { background: var(--blue-70); }
+.btn.secondary {
+  background: transparent;
+  color: var(--gray-100);
+  border: 1px solid var(--gray-60);
+}
+.btn.secondary:hover { background: var(--gray-10); }
+.btn.sm { padding: 6px 12px; font-size: 12px; }
+
+.btn-group { display: flex; gap: 1px; background: var(--gray-30); border: 1px solid var(--gray-30); width: fit-content; }
+.btn-group button {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: none;
+  background: var(--white);
+  color: var(--gray-70);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.btn-group button.active { background: var(--gray-100); color: var(--white); }
+.btn-group button:hover:not(.active) { background: var(--gray-10); }
+
+/* ------------------------------------------------------------
+   DATA TABLE
+   ------------------------------------------------------------ */
+.table-toolbar {
+  display: flex;
+  gap: var(--sp-03);
+  align-items: center;
+  padding: var(--sp-04) var(--sp-05);
+  border-bottom: var(--border);
+  flex-wrap: wrap;
+}
+
+.search-input {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border: 1px solid var(--gray-40, var(--gray-30));
+  background: var(--gray-10);
+  padding: 8px 10px;
+  min-width: 220px;
+  color: var(--gray-100);
+}
+.search-input:focus { outline: 2px solid var(--blue-60); outline-offset: -1px; background: var(--white); }
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+table.data-table thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-60);
+  background: var(--gray-10);
+  padding: var(--sp-03) var(--sp-04);
+  border-bottom: 1px solid var(--gray-30);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+table.data-table thead th:hover { color: var(--gray-100); }
+table.data-table thead th .arrow { font-family: var(--font-mono); margin-left: 4px; color: var(--blue-60); }
+table.data-table tbody td {
+  padding: var(--sp-03) var(--sp-04);
+  border-bottom: 1px solid var(--gray-20);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+table.data-table tbody tr:hover { background: var(--gray-10); }
+.table-scroll { max-height: 420px; overflow: auto; }
+
+.cell-num { text-align: right; }
+.bar-cell { display: flex; align-items: center; gap: 8px; }
+.bar-cell .track { flex: 1; height: 6px; background: var(--gray-20); position: relative; min-width: 60px; }
+.bar-cell .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--blue-60); }
+.bar-cell .fill.risk { background: var(--red-50); }
+
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-03) var(--sp-05);
+  border-top: var(--border);
+  font-size: 12px;
+  color: var(--gray-60);
+  font-family: var(--font-mono);
+}
+
+/* ------------------------------------------------------------
+   CHART SHELL / TOOLTIP
+   ------------------------------------------------------------ */
+.chart-wrap { position: relative; }
+svg.chart { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-mono); }
+.axis-label { font-size: 10px; fill: var(--gray-60); }
+.axis-line { stroke: var(--gray-20); stroke-width: 1; }
+.gridline { stroke: var(--gray-20); stroke-width: 1; shape-rendering: crispEdges; }
+
+.chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--gray-100);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 10px;
+  min-width: 140px;
+  opacity: 0;
+  transition: opacity 90ms var(--ease);
+  z-index: 20;
+  transform: translate(-50%, -100%);
+}
+.chart-tooltip.show { opacity: 1; }
+.chart-tooltip .tt-title { color: var(--gray-30); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.chart-tooltip .tt-row { display: flex; justify-content: space-between; gap: 12px; }
+.chart-tooltip .tt-row + .tt-row { margin-top: 2px; }
+.chart-tooltip .swatch { width: 8px; height: 8px; display: inline-block; margin-right: 6px; }
+
+.legend { display: flex; gap: var(--sp-05); flex-wrap: wrap; margin-top: var(--sp-04); font-size: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; color: var(--gray-70); }
+.legend-swatch { width: 10px; height: 10px; display: inline-block; flex-shrink: 0; }
+
+/* ------------------------------------------------------------
+   SLIDER (risk trend range)
+   ------------------------------------------------------------ */
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-04);
+  padding: var(--sp-04) 0 var(--sp-02);
+}
+.range-endpoint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gray-100);
+  background: var(--gray-10);
+  border: 1px solid var(--gray-30);
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.range-track-wrap { flex: 1; position: relative; height: 24px; display: flex; align-items: center; }
+.range-track { position: absolute; left: 0; right: 0; height: 2px; background: var(--gray-30); }
+.range-fill { position: absolute; height: 2px; background: var(--blue-60); }
+.range-handle {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--white);
+  border: 2px solid var(--blue-60);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  touch-action: none;
+}
+.range-handle:active { cursor: grabbing; }
+.range-handle:focus-visible { outline: 2px solid var(--blue-60); outline-offset: 3px; }
+
+/* ------------------------------------------------------------
+   NOTICE / EMPTY / ANNOTATION
+   ------------------------------------------------------------ */
+.notice {
+  border-left: 3px solid var(--blue-60);
+  background: var(--gray-10);
+  padding: var(--sp-04) var(--sp-05);
+  font-size: 13px;
+  color: var(--gray-80);
+  display: flex;
+  gap: var(--sp-04);
+  align-items: flex-start;
+}
+.notice.risk { border-left-color: var(--red-50); }
+.notice .notice-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--gray-60);
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.divide-line { height: 1px; background: var(--gray-20); border: none; margin: var(--sp-07) 0; }
+
+/* ------------------------------------------------------------
+   BEFORE/AFTER STRIP (mirrors reference: eyebrow + split marker)
+   ------------------------------------------------------------ */
+.split-marker {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-60);
+  margin-bottom: var(--sp-02);
+}
+.split-marker .before-lbl { color: var(--gray-70); }
+.split-marker .after-lbl { color: var(--blue-60); }
+
+/* ------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------ */
+.site-footer {
+  border-top: 1px solid var(--gray-20);
+  margin-top: var(--sp-10);
+  padding: var(--sp-07) 0 var(--sp-09);
+  background: var(--gray-10);
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sp-05);
+  font-size: 12px;
+  color: var(--gray-60);
+}
+.footer-inner .fcol { display: flex; flex-direction: column; gap: var(--sp-02); }
+.footer-inner .fcol .fh {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gray-100);
+  font-size: 11px;
+  margin-bottom: var(--sp-02);
+}
+
+/* ------------------------------------------------------------
+   MISC UTIL
+   ------------------------------------------------------------ */
+.mono { font-family: var(--font-mono); }
+.small { font-size: 12px; color: var(--gray-60); }
+.text-right { text-align: right; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.pill-list { display: flex; gap: var(--sp-02); flex-wrap: wrap; }
+
+@media (max-width: 700px) {
+  .page-title { font-size: 26px; }
+  .page-header-side { display: none; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= TOP SHELL ================= -->
+<header class="shell-header">
+  <div class="shell-brand">
+    <span class="mark" aria-hidden="true"></span>
+    FEATSRV
+  </div>
+  <nav class="shell-crumbs" aria-label="Breadcrumb">
+    <span>Borel Sigma Inc.</span>
+    <span class="sep">/</span>
+    <span>Zi‑US Research</span>
+    <span class="sep">/</span>
+    <span class="current">Feature Serving Console</span>
+  </nav>
+  <div class="shell-meta">
+    <div class="shell-meta-item"><span class="status-dot" aria-hidden="true"></span> api.featsrv.q-dit.com — live</div>
+    <div class="shell-meta-item" id="clock-display">—</div>
+    <div class="shell-meta-item">build 2.0.0</div>
+  </div>
+</header>
+
+<!-- ================= PAGE HEADER ================= -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <span class="page-eyebrow">Point‑in‑Time Feature Store — Session Report</span>
+      <h1 class="page-title">Feature serving, <b>without the leakage.</b></h1>
+      <p class="page-sub">
+        A visual companion to the FEATSRV CLI. Every panel below corresponds to one of the CLI's
+        seven services — point‑in‑time training sets, online policy/claim lookups, batch offline
+        features, leakage audits, feature importance, and system health — rendered from the same
+        JSON responses the terminal saves to <span class="mono">Response‑FEATSRV/</span>.
+      </p>
+    </div>
+    <div class="page-header-side">
+      <div class="side-stat"><span class="num" id="hdr-entities">128,406</span><span class="lbl">Entities tracked</span></div>
+      <div class="side-stat"><span class="num" id="hdr-features">312</span><span class="lbl">Registered features</span></div>
+      <div class="side-stat"><span class="num" id="hdr-uptime">99.97%</span><span class="lbl">30‑day uptime</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= KPI ROW ================= -->
+<div class="wrap">
+  <div class="kpi-row" id="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">7 · System health</div>
+      <div class="kpi-value" id="kpi-health">OK</div>
+      <div class="kpi-delta up">▲ 200 · p95 41ms</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">2–4 · Requests served (24h)</div>
+      <div class="kpi-value" id="kpi-requests">94,812</div>
+      <div class="kpi-delta up">▲ 6.4% vs prior day</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">5 · Leakage flags open</div>
+      <div class="kpi-value" id="kpi-leakage">3</div>
+      <div class="kpi-delta down">▼ 2 resolved this week</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">1 · PIT training rows generated</div>
+      <div class="kpi-value" id="kpi-pit">2.41M</div>
+      <div class="kpi-delta flat">— last run 03 Aug 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TABS ================= -->
+<div class="wrap">
+  <div class="tabbar" role="tablist" aria-label="FEATSRV services">
+    <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true"><span class="tab-num">00</span>Overview</button>
+    <button class="tab-btn" data-tab="lineage" role="tab" aria-selected="false"><span class="tab-num">01</span>Data Lineage</button>
+    <button class="tab-btn" data-tab="risk" role="tab" aria-selected="false"><span class="tab-num">05</span>Risk &amp; Leakage Audit</button>
+    <button class="tab-btn" data-tab="importance" role="tab" aria-selected="false"><span class="tab-num">06</span>Feature Importance</button>
+    <button class="tab-btn" data-tab="training" role="tab" aria-selected="false"><span class="tab-num">01/04</span>Training &amp; Batch Sets</button>
+    <button class="tab-btn" data-tab="online" role="tab" aria-selected="false"><span class="tab-num">02/03</span>Online Lookups</button>
+  </div>
+
+  <!-- ============================================================
+       TAB 0 — OVERVIEW  (before/after adoption chart, activity log)
+       ============================================================ -->
+  <section class="tab-panel active" id="panel-overview">
+    <div class="section-heading">
+      <div>
+        <h2>Online feature request volume — before / after real‑time rollout</h2>
+        <p class="desc">Monthly request count against the Redis‑backed online store. The dashed
+          line marks the cut‑over from batch‑only serving (Jan 2024) to real‑time point‑in‑time
+          serving. Same shape of chart the CLI's <span class="mono">--health</span> and
+          <span class="mono">online/*</span> endpoints roll up into.</p>
+      </div>
+      <span class="section-meta">SOURCE: /health · /online/policy · /online/claim</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="split-marker">
+          <span class="before-lbl">◂ Before — batch only</span>
+          <span class="after-lbl">Real‑time cut‑over, Jan 2024 ▸</span>
+        </div>
+        <div class="chart-wrap" id="adoption-chart-wrap">
+          <svg class="chart" id="adoption-chart" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="adoption-tooltip"></div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--gray-30)"></span>Batch serving</span>
+          <span class="legend-item"><span class="legend-swatch" style="background:var(--blue-60)"></span>Real‑time serving</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divide-line">
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Recent CLI activity</h3>
+            <div class="card-sub">Last 8 sessions written to Response‑FEATSRV/</div>
+          </div>
+          <span class="tag blue">LIVE TAIL</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="activity-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Service</th>
+                <th>Entity</th>
+                <th>Status</th>
+                <th class="cell-num">Latency</th>
+              </tr>
+            </thead>
+            <tbody id="activity-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Service call mix (24h)</h3>
+            <div class="card-sub">Share of total requests by endpoint</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="mix-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 1 — DATA LINEAGE  (signature sankey)
+       ============================================================ -->
+  <section class="tab-panel" id="panel-lineage">
+    <div class="section-heading">
+      <div>
+        <h2>Feature lineage — source to consumer</h2>
+        <p class="desc">Every value served online or offline traces back through the point‑in‑time
+          store. Flow width is proportional to feature‑value volume over the trailing 30 days.
+          Hover a ribbon to isolate its path.</p>
+      </div>
+      <span class="section-meta">SOURCE: /pit-training · /offline · /online/*</span>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="chart-wrap" id="sankey-wrap">
+          <svg class="chart" id="sankey-chart" viewBox="0 0 1200 620" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="sankey-tooltip"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top: var(--sp-06);">
+      <span class="notice-label">Note</span>
+      <span>The point‑in‑time store is the single write path for both online and offline
+        consumers — this is what the leakage audit (Tab 05) verifies: no feature value reaches a
+        consumer with a <span class="mono">feature_timestamp</span> later than the
+        <span class="mono">event_timestamp</span> it was requested against.</span>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 2 — RISK & LEAKAGE  (mirrors credit-risk reference layout)
+       ============================================================ -->
+  <section class="tab-panel" id="panel-risk">
+    <div class="section-heading">
+      <div>
+        <h2>Leakage exposure by feature domain</h2>
+        <p class="desc">Percent of served feature‑values at risk of temporal leakage, and the
+          projected volume of training rows that would need regeneration if unresolved.</p>
+      </div>
+      <span class="section-meta">SOURCE: /leakage-audit</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Leakage risk by portfolio</h3><div class="card-sub">% of feature‑values at risk</div></div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap" id="risk-bar-wrap">
+            <svg class="chart" id="risk-bar-chart" viewBox="0 0 560 260" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="chart-tooltip" id="risk-bar-tooltip"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Projected rows requiring regeneration</h3><div class="card-sub">Next 24 months, by portfolio</div></div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap" id="risk-proj-wrap">
+            <svg class="chart" id="risk-proj-chart" viewBox="0 0 560 260" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="chart-tooltip" id="risk-proj-tooltip"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divide-line">
+
+    <div class="card">
+      <div class="card-header">
+        <div><h3>Leakage trend</h3><div class="card-sub">Open flags over the selected window</div></div>
+        <div class="btn-group" id="risk-range-presets">
+          <button data-months="3">3M</button>
+          <button data-months="6" class="active">6M</button>
+          <button data-months="12">12M</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="range-row">
+          <span class="range-endpoint" id="range-start-label">Feb 2026</span>
+          <div class="range-track-wrap" id="range-track-wrap">
+            <div class="range-track"></div>
+            <div class="range-fill" id="range-fill"></div>
+            <div class="range-handle" id="range-handle-lo" tabindex="0" role="slider" aria-label="Range start"></div>
+            <div class="range-handle" id="range-handle-hi" tabindex="0" role="slider" aria-label="Range end"></div>
+          </div>
+          <span class="range-endpoint" id="range-end-label">Aug 2026</span>
+        </div>
+        <div class="chart-wrap" id="risk-line-wrap">
+          <svg class="chart" id="risk-line-chart" viewBox="0 0 1160 280" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="risk-line-tooltip"></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divide-line">
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Entity risk‑score distribution</h3><div class="card-sub">Feature‑confidence score, 300–850 band</div></div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap" id="hist-wrap">
+            <svg class="chart" id="hist-chart" viewBox="0 0 720 260" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="chart-tooltip" id="hist-tooltip"></div>
+          </div>
+          <div class="legend" id="hist-legend"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Open leakage audit findings</h3><div class="card-sub">/leakage-audit — filtered, sortable</div></div>
+        </div>
+        <div class="table-toolbar">
+          <input class="search-input" id="leakage-search" type="text" placeholder="Filter by entity_id, feature, or portfolio…">
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="leakage-table">
+            <thead>
+              <tr>
+                <th data-key="entity_id">Entity</th>
+                <th data-key="feature">Feature</th>
+                <th data-key="portfolio">Portfolio</th>
+                <th data-key="delta_hours" class="cell-num">Δ hours</th>
+                <th data-key="severity">Severity</th>
+              </tr>
+            </thead>
+            <tbody id="leakage-tbody"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="leakage-count">— rows</span>
+          <span>severity: <span class="tag red">high</span> <span class="tag gray">medium</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 3 — FEATURE IMPORTANCE
+       ============================================================ -->
+  <section class="tab-panel" id="panel-importance">
+    <div class="section-heading">
+      <div>
+        <h2>Feature importance summary</h2>
+        <p class="desc">Ranked by mean absolute contribution across the active underwriting and
+          pricing models. Matches the CLI's <span class="mono">feature-importance</span> service
+          output, including its rank‑bar rendering.</p>
+      </div>
+      <span class="section-meta">SOURCE: /feature-importance</span>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div><h3>Top 14 features</h3><div class="card-sub">Importance score, 0.0–1.0 scale</div></div>
+        <div class="btn-group" id="importance-model-toggle">
+          <button data-model="underwriting" class="active">Underwriting</button>
+          <button data-model="pricing">Pricing</button>
+          <button data-model="fraud">Fraud</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap" id="importance-wrap">
+          <svg class="chart" id="importance-chart" viewBox="0 0 1100 480" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="chart-tooltip" id="importance-tooltip"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 4 — TRAINING & BATCH SETS
+       ============================================================ -->
+  <section class="tab-panel" id="panel-training">
+    <div class="section-heading">
+      <div>
+        <h2>Point‑in‑time training set preview</h2>
+        <p class="desc">First rows of the most recent PIT training pull, exactly as saved to
+          <span class="mono">pit_training_result.json</span>.</p>
+      </div>
+      <span class="section-meta">SOURCE: /pit-training</span>
+    </div>
+
+    <div class="card">
+      <div class="table-toolbar">
+        <input class="search-input" id="pit-search" type="text" placeholder="Filter by claim_id or policy_id…">
+        <span class="tag blue" id="pit-rowcount">— rows</span>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table" id="pit-table">
+          <thead>
+            <tr>
+              <th data-key="claim_id">claim_id</th>
+              <th data-key="policy_id">policy_id</th>
+              <th data-key="event_timestamp">event_timestamp</th>
+              <th data-key="feature_timestamp">feature_timestamp</th>
+              <th data-key="claim_severity_score" class="cell-num">claim_severity_score</th>
+              <th data-key="prior_claims_24m" class="cell-num">prior_claims_24m</th>
+              <th data-key="label_charge_off" class="cell-num">label_charge_off</th>
+            </tr>
+          </thead>
+          <tbody id="pit-tbody"></tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span id="pit-footer-count">—</span>
+        <span>Generated 03 Aug 2026 · 22:14 UTC</span>
+      </div>
+    </div>
+
+    <hr class="divide-line">
+
+    <div class="section-heading">
+      <div>
+        <h2>Batch offline features — last payload</h2>
+        <p class="desc">Response body of the most recent <span class="mono">/offline</span> POST.</p>
+      </div>
+      <span class="section-meta">SOURCE: /offline</span>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table class="data-table" id="batch-table">
+          <thead>
+            <tr>
+              <th>entity_id</th>
+              <th>entity_type</th>
+              <th class="cell-num">telematics_score</th>
+              <th class="cell-num">credit_band</th>
+              <th class="cell-num">exposure_months</th>
+              <th>region</th>
+            </tr>
+          </thead>
+          <tbody id="batch-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 5 — ONLINE LOOKUPS
+       ============================================================ -->
+  <section class="tab-panel" id="panel-online">
+    <div class="section-heading">
+      <div>
+        <h2>Online feature lookup</h2>
+        <p class="desc">Simulates the CLI's real‑time Redis‑backed lookups. Enter an ID matching
+          the sample formats below, or pick one of the recent entities.</p>
+      </div>
+      <span class="section-meta">SOURCE: /online/policy/:id · /online/claim/:id</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Policy features</h3><div class="card-sub">Format: POL‑0000</div></div>
+        </div>
+        <div class="card-body">
+          <div class="table-toolbar" style="padding:0 0 var(--sp-04) 0; border:none;">
+            <input class="search-input" id="policy-input" type="text" placeholder="POL-0000" value="POL-4471">
+            <button class="btn sm" id="policy-lookup-btn">Look up</button>
+          </div>
+          <table class="data-table" id="policy-result-table"><tbody id="policy-result-tbody"></tbody></table>
+          <div class="pill-list" style="margin-top:var(--sp-04);" id="policy-recent"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><h3>Claim features</h3><div class="card-sub">Format: CLM‑00000</div></div>
+        </div>
+        <div class="card-body">
+          <div class="table-toolbar" style="padding:0 0 var(--sp-04) 0; border:none;">
+            <input class="search-input" id="claim-input" type="text" placeholder="CLM-00000" value="CLM-88213">
+            <button class="btn sm" id="claim-lookup-btn">Look up</button>
+          </div>
+          <table class="data-table" id="claim-result-table"><tbody id="claim-result-tbody"></tbody></table>
+          <div class="pill-list" style="margin-top:var(--sp-04);" id="claim-recent"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="fcol">
+      <span class="fh">FEATSRV Console</span>
+      <span>Point‑in‑Time Feature Serving — v2.0.0</span>
+      <span>Zi‑US Research · Borel Sigma Inc.</span>
+    </div>
+    <div class="fcol">
+      <span class="fh">Endpoints visualized</span>
+      <span class="mono">/pit-training · /online/policy · /online/claim</span>
+      <span class="mono">/offline · /leakage-audit · /feature-importance · /health</span>
+    </div>
+    <div class="fcol">
+      <span class="fh">Data</span>
+      <span>All figures on this page are synthetic session data generated
+        client‑side for layout and interaction review — not live production values.</span>
+    </div>
+    <div class="fcol">
+      <span class="fh">Generated</span>
+      <span class="mono" id="footer-timestamp">—</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+/* ============================================================
+   0. SHARED UTILITIES
+   ============================================================ */
+
+const COLOR = {
+  blue: '#0f62fe',
+  blueDark: '#0043ce',
+  blueLight: '#d0e2ff',
+  gray100: '#161616',
+  gray80: '#393939',
+  gray70: '#525252',
+  gray60: '#6f6f6f',
+  gray50: '#8d8d8d',
+  gray30: '#c6c6c6',
+  gray20: '#e0e0e0',
+  gray10: '#f4f4f4',
+  green: '#24a148',
+  greenLight: '#defbe6',
+  red: '#da1e28',
+  redLight: '#fff1f1',
+  white: '#ffffff'
+};
+
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  if (attrs) {
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+  }
+  return el;
+}
+
+function clearSvg(svg) {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
+}
+
+function fmtInt(n) {
+  return Math.round(n).toLocaleString('en-US');
+}
+
+function fmtCompact(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.00$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(Math.round(n));
+}
+
+function fmtPct(n, digits) {
+  return n.toFixed(digits === undefined ? 1 : digits) + '%';
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+// Deterministic pseudo-random generator so the "sample data" is stable
+// across reloads within a session, rather than jittering every paint.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = mulberry32(19740611);
+
+function randRange(min, max) { return min + rand() * (max - min); }
+function randInt(min, max) { return Math.floor(randRange(min, max + 1)); }
+function choice(arr) { return arr[Math.floor(rand() * arr.length)]; }
+
+function attachTooltip(container, tooltipEl) {
+  return function showTip(x, y, html) {
+    tooltipEl.innerHTML = html;
+    tooltipEl.style.left = x + 'px';
+    tooltipEl.style.top = (y - 10) + 'px';
+    tooltipEl.classList.add('show');
+  };
+}
+function hideTooltip(tooltipEl) {
+  tooltipEl.classList.remove('show');
+}
+
+/* ============================================================
+   1. CLOCK / TIMESTAMPS
+   ============================================================ */
+function updateClock() {
+  const now = new Date();
+  const el = document.getElementById('clock-display');
+  if (el) {
+    el.textContent = now.getUTCFullYear() + '-' + pad2(now.getUTCMonth() + 1) + '-' + pad2(now.getUTCDate()) +
+      ' ' + pad2(now.getUTCHours()) + ':' + pad2(now.getUTCMinutes()) + ':' + pad2(now.getUTCSeconds()) + ' UTC';
+  }
+  const foot = document.getElementById('footer-timestamp');
+  if (foot) {
+    foot.textContent = 'Rendered ' + now.toISOString();
+  }
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ============================================================
+   2. TABS
+   ============================================================ */
+(function initTabs() {
+  const btns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+      const target = document.getElementById('panel-' + btn.dataset.tab);
+      if (target) target.classList.add('active');
+      // Re-render charts sized to the now-visible panel to avoid 0-width SVG boxes.
+      requestAnimationFrame(renderAllChartsOnce);
+    });
+  });
+})();
+
+/* ============================================================
+   3. SAMPLE DATA GENERATION
+   Mirrors the shapes returned by the seven FEATSRV CLI services.
+   ============================================================ */
+
+// --- 3.1 Monthly online request volume, 2018–2026, with a cut-over ---
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const CUTOVER_YEAR = 2024, CUTOVER_MONTH = 0; // Jan 2024
+
+function buildAdoptionSeries() {
+  const series = [];
+  let base = 8000;
+  for (let y = 2018; y <= 2026; y++) {
+    const maxM = (y === 2026) ? 6 : 11; // partial current year through Jul
+    for (let m = 0; m <= maxM; m++) {
+      const isAfter = (y > CUTOVER_YEAR) || (y === CUTOVER_YEAR && m >= CUTOVER_MONTH);
+      const growth = 1 + (y - 2018) * 0.28 + m * 0.01;
+      let value = base * growth * (isAfter ? randRange(2.1, 2.6) : randRange(0.9, 1.15));
+      value += randRange(-1500, 1500);
+      value = Math.max(1000, value);
+      series.push({ year: y, month: m, label: MONTH_NAMES[m] + " '" + String(y).slice(2), value, isAfter });
+    }
+  }
+  return series;
+}
+const adoptionSeries = buildAdoptionSeries();
+
+// --- 3.2 Recent CLI activity log ---
+const SERVICES = ['pit-training', 'online/policy', 'online/claim', 'offline', 'leakage-audit', 'feature-importance', 'health'];
+function buildActivityLog(n) {
+  const rows = [];
+  const now = Date.now();
+  for (let i = 0; i < n; i++) {
+    const svc = choice(SERVICES);
+    const ok = rand() > 0.06;
+    rows.push({
+      ts: new Date(now - i * randInt(40, 900) * 1000),
+      service: svc,
+      entity: svc.includes('policy') ? 'POL-' + randInt(1000, 9999)
+             : svc.includes('claim') ? 'CLM-' + randInt(10000, 99999)
+             : svc === 'pit-training' ? 'batch#' + randInt(400, 899)
+             : svc === 'offline' ? 'batch#' + randInt(900, 999)
+             : '—',
+      status: ok ? 200 : choice([401, 404, 429, 500]),
+      latency: randInt(9, 340)
+    });
+  }
+  return rows;
+}
+const activityLog = buildActivityLog(28);
+
+// --- 3.3 Service call mix ---
+const serviceMix = [
+  { name: 'online/policy', pct: 34.2 },
+  { name: 'online/claim', pct: 28.7 },
+  { name: 'feature-importance', pct: 14.1 },
+  { name: 'offline', pct: 11.4 },
+  { name: 'health', pct: 6.9 },
+  { name: 'leakage-audit', pct: 3.1 },
+  { name: 'pit-training', pct: 1.6 }
+];
+
+// --- 3.4 Lineage sankey ---
+const sankeyData = {
+  nodes: [
+    { id: 'policy_db', label: 'Policy DB', col: 0 },
+    { id: 'claims_db', label: 'Claims DB', col: 0 },
+    { id: 'telematics', label: 'Telematics Stream', col: 0 },
+    { id: 'bureau', label: 'External Bureau Feed', col: 0 },
+
+    { id: 'pit_store', label: 'PIT Feature Store', col: 1 },
+    { id: 'online_store', label: 'Online Store (Redis)', col: 1 },
+    { id: 'audit_engine', label: 'Leakage Audit Engine', col: 1 },
+
+    { id: 'underwriting', label: 'Underwriting Model', col: 2 },
+    { id: 'pricing', label: 'Pricing Engine', col: 2 },
+    { id: 'fraud', label: 'Fraud Model', col: 2 },
+    { id: 'reporting', label: 'Actuarial Reporting', col: 2 }
+  ],
+  links: [
+    { source: 'policy_db', target: 'pit_store', value: 420 },
+    { source: 'policy_db', target: 'online_store', value: 260 },
+    { source: 'claims_db', target: 'pit_store', value: 380 },
+    { source: 'claims_db', target: 'online_store', value: 310 },
+    { source: 'telematics', target: 'online_store', value: 190 },
+    { source: 'telematics', target: 'pit_store', value: 90 },
+    { source: 'bureau', target: 'pit_store', value: 140 },
+    { source: 'bureau', target: 'audit_engine', value: 40 },
+
+    { source: 'pit_store', target: 'underwriting', value: 360 },
+    { source: 'pit_store', target: 'pricing', value: 300 },
+    { source: 'pit_store', target: 'reporting', value: 260 },
+    { source: 'pit_store', target: 'audit_engine', value: 110 },
+    { source: 'online_store', target: 'underwriting', value: 210 },
+    { source: 'online_store', target: 'fraud', value: 400 },
+    { source: 'online_store', target: 'pricing', value: 150 },
+    { source: 'audit_engine', target: 'reporting', value: 90 }
+  ]
+};
+
+// --- 3.5 Risk by portfolio (mirrors reference "Loan Charge Off Predictions") ---
+const riskPortfolios = [
+  { name: '1st Mortgage → Auto (Comprehensive)', pctAtRisk: 7.13, projected: 3.8e6 },
+  { name: '2nd Mortgage → Auto (Liability)', pctAtRisk: 7.65, projected: 2.1e6 },
+  { name: 'HELOC → Homeowners', pctAtRisk: 10.42, projected: 5.6e6 },
+  { name: 'ARM/Hybrid → Workers Comp', pctAtRisk: 12.05, projected: 6.9e6 },
+  { name: 'Other → Umbrella / Excess', pctAtRisk: 9.97, projected: 4.4e6 }
+];
+
+// --- 3.6 Leakage trend, monthly Jan 2012-equivalent -> mapped to Jan2026-Dec2026 style window ---
+function buildRiskTrend() {
+  const months = [];
+  let val = 35.31, xlevel = 9.86;
+  for (let i = 0; i < 24; i++) {
+    val = Math.max(28, val - randRange(0.1, 0.9) + (i % 5 === 0 ? randRange(0.4, 1.1) : 0));
+    xlevel = Math.max(2.5, xlevel - randRange(0.05, 0.5));
+    const d = new Date(Date.UTC(2025, 0, 1));
+    d.setUTCMonth(d.getUTCMonth() + i);
+    months.push({ date: d, projectedChargeOff: val, xLevelBalance: xlevel });
+  }
+  return months;
+}
+const riskTrend = buildRiskTrend();
+
+// --- 3.7 Score histogram (credit-score-style distribution) ---
+const scoreBands = [
+  { label: 'Tier D', color: COLOR.red, range: [300, 500] },
+  { label: 'Tier C', color: '#ff832b', range: [500, 620] },
+  { label: 'Tier B', color: '#f1c21b', range: [620, 700] },
+  { label: 'Tier A', color: '#42be65', range: [700, 780] },
+  { label: 'Tier A+', color: '#0e6027', range: [780, 850] }
+];
+function buildHistogram() {
+  const buckets = [];
+  for (let s = 300; s <= 850; s += 8) buckets.push({ score: s, balance: 0, band: null });
+  buckets.forEach(b => {
+    const band = scoreBands.find(bd => b.score >= bd.range[0] && b.score < bd.range[1]) || scoreBands[scoreBands.length - 1];
+    b.band = band;
+    const center = (band.range[0] + band.range[1]) / 2;
+    const spread = (band.range[1] - band.range[0]) / 2.2;
+    const dist = Math.exp(-0.5 * Math.pow((b.score - center) / spread, 2));
+    b.balance = dist * randRange(2.2e6, 4.2e6) * (1 + (rand() - 0.5) * 0.35);
+  });
+  return buckets;
+}
+const histogramData = buildHistogram();
+
+// --- 3.8 Leakage audit findings table ---
+function buildLeakageFindings(n) {
+  const feats = ['telematics_score', 'prior_claims_24m', 'credit_band', 'exposure_months', 'claim_severity_score', 'region_risk_index', 'bureau_score_v3'];
+  const portfolios = ['Auto Comprehensive', 'Auto Liability', 'Homeowners', 'Workers Comp', 'Umbrella'];
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const deltaHours = randRange(-48, 4);
+    rows.push({
+      entity_id: rand() > 0.5 ? 'POL-' + randInt(1000, 9999) : 'CLM-' + randInt(10000, 99999),
+      feature: choice(feats),
+      portfolio: choice(portfolios),
+      delta_hours: Math.round(deltaHours * 10) / 10,
+      severity: deltaHours > -2 ? 'high' : (deltaHours > -12 ? 'medium' : 'low')
+    });
+  }
+  return rows.filter(r => r.severity !== 'low').concat(rows.filter(r => r.severity === 'low').slice(0, 4));
+}
+let leakageFindings = buildLeakageFindings(46);
+
+// --- 3.9 Feature importance per model ---
+const importanceByModel = {
+  underwriting: [
+    ['prior_claims_24m', 0.182], ['credit_band', 0.151], ['telematics_score', 0.134],
+    ['exposure_months', 0.098], ['claim_severity_score', 0.091], ['region_risk_index', 0.077],
+    ['bureau_score_v3', 0.069], ['vehicle_age', 0.058], ['annual_mileage', 0.051],
+    ['prior_lapses', 0.044], ['garaging_zip_density', 0.021], ['policy_tenure_months', 0.014],
+    ['payment_method', 0.006], ['multi_policy_flag', 0.004]
+  ],
+  pricing: [
+    ['region_risk_index', 0.176], ['credit_band', 0.149], ['vehicle_age', 0.121],
+    ['annual_mileage', 0.108], ['prior_claims_24m', 0.096], ['telematics_score', 0.088],
+    ['exposure_months', 0.071], ['garaging_zip_density', 0.062], ['bureau_score_v3', 0.045],
+    ['policy_tenure_months', 0.033], ['multi_policy_flag', 0.021], ['payment_method', 0.012],
+    ['prior_lapses', 0.009], ['claim_severity_score', 0.009]
+  ],
+  fraud: [
+    ['claim_severity_score', 0.201], ['prior_claims_24m', 0.164], ['bureau_score_v3', 0.132],
+    ['telematics_score', 0.119], ['region_risk_index', 0.087], ['exposure_months', 0.069],
+    ['prior_lapses', 0.058], ['credit_band', 0.049], ['policy_tenure_months', 0.038],
+    ['payment_method', 0.031], ['vehicle_age', 0.022], ['annual_mileage', 0.017],
+    ['garaging_zip_density', 0.009], ['multi_policy_flag', 0.004]
+  ]
+};
+
+// --- 3.10 PIT training rows ---
+function buildPitRows(n) {
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const evt = new Date(Date.UTC(2026, randInt(0, 6), randInt(1, 28), randInt(0, 23), randInt(0, 59)));
+    const feat = new Date(evt.getTime() - randInt(1, 6) * 3600 * 1000);
+    rows.push({
+      claim_id: 'CLM-' + randInt(10000, 99999),
+      policy_id: 'POL-' + randInt(1000, 9999),
+      event_timestamp: evt.toISOString().slice(0, 19).replace('T', ' '),
+      feature_timestamp: feat.toISOString().slice(0, 19).replace('T', ' '),
+      claim_severity_score: Math.round(randRange(0.05, 0.98) * 100) / 100,
+      prior_claims_24m: randInt(0, 5),
+      label_charge_off: rand() > 0.86 ? 1 : 0
+    });
+  }
+  return rows;
+}
+const pitRows = buildPitRows(180);
+
+// --- 3.11 Batch offline rows ---
+function buildBatchRows(n) {
+  const regions = ['NE-01', 'NE-02', 'MW-04', 'SE-03', 'SW-01', 'W-06'];
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    rows.push({
+      entity_id: rand() > 0.5 ? 'POL-' + randInt(1000, 9999) : 'CLM-' + randInt(10000, 99999),
+      entity_type: rand() > 0.5 ? 'policy' : 'claim',
+      telematics_score: Math.round(randRange(0.1, 0.99) * 100) / 100,
+      credit_band: randInt(1, 9),
+      exposure_months: randInt(1, 60),
+      region: choice(regions)
+    });
+  }
+  return rows;
+}
+const batchRows = buildBatchRows(22);
+
+// --- 3.12 Sample online entities (for policy/claim lookup demo) ---
+function buildOnlineEntity(id, isClaim) {
+  const base = {
+    id,
+    credit_band: randInt(1, 9),
+    telematics_score: Math.round(randRange(0.2, 0.99) * 100) / 100,
+    prior_claims_24m: randInt(0, 4),
+    region_risk_index: Math.round(randRange(0.1, 0.9) * 100) / 100,
+    exposure_months: randInt(1, 60),
+    bureau_score_v3: randInt(300, 850)
+  };
+  if (isClaim) {
+    base.claim_severity_score = Math.round(randRange(0.05, 0.98) * 100) / 100;
+    base.days_open = randInt(1, 240);
+    base.reserve_amount = Math.round(randRange(1200, 84000));
+  } else {
+    base.policy_tenure_months = randInt(1, 96);
+    base.multi_policy_flag = rand() > 0.6 ? 1 : 0;
+  }
+  return base;
+}
+
+/* ============================================================
+   4. CHART: ADOPTION BAR CHART (before/after)
+   ============================================================ */
+function renderAdoptionChart() {
+  const svg = document.getElementById('adoption-chart');
+  const tooltip = document.getElementById('adoption-tooltip');
+  const wrap = document.getElementById('adoption-chart-wrap');
+  clearSvg(svg);
+
+  const W = 1200, H = 360;
+  const marginLeft = 56, marginBottom = 34, marginTop = 14, marginRight = 8;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  const maxVal = Math.max(...adoptionSeries.map(d => d.value)) * 1.08;
+  const n = adoptionSeries.length;
+  const gap = 2;
+  const barW = Math.max(1.5, plotW / n - gap);
+
+  // gridlines + y-axis labels
+  const ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const v = (maxVal / ticks) * i;
+    const y = marginTop + plotH - (v / maxVal) * plotH;
+    svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: y, y2: y, class: 'gridline' }));
+    const t = svgEl('text', { x: marginLeft - 8, y: y + 4, 'text-anchor': 'end', class: 'axis-label' });
+    t.textContent = fmtCompact(v);
+    svg.appendChild(t);
+  }
+
+  // cutover index
+  const cutoverIdx = adoptionSeries.findIndex(d => d.isAfter);
+  const cutoverX = marginLeft + cutoverIdx * (plotW / n);
+  svg.appendChild(svgEl('line', {
+    x1: cutoverX, x2: cutoverX, y1: marginTop, y2: marginTop + plotH,
+    stroke: COLOR.gray70, 'stroke-width': 1, 'stroke-dasharray': '4 3'
+  }));
+
+  const group = svgEl('g');
+  adoptionSeries.forEach((d, i) => {
+    const x = marginLeft + i * (plotW / n);
+    const h = (d.value / maxVal) * plotH;
+    const y = marginTop + plotH - h;
+    const rect = svgEl('rect', {
+      x, y, width: barW, height: h,
+      fill: d.isAfter ? COLOR.blue : COLOR.gray30,
+      'data-idx': i
+    });
+    rect.style.transition = 'opacity 90ms ease';
+    rect.addEventListener('mouseenter', (e) => {
+      rect.style.opacity = '0.7';
+      const rectBounds = wrap.getBoundingClientRect();
+      const px = ((x + barW / 2) / W) * rectBounds.width;
+      const py = ((y) / H) * rectBounds.height;
+      tooltip.innerHTML =
+        '<div class="tt-title">' + d.label + '</div>' +
+        '<div class="tt-row"><span><span class="swatch" style="background:' + (d.isAfter ? COLOR.blue : COLOR.gray30) + '"></span>' +
+        (d.isAfter ? 'Real-time' : 'Batch') + '</span><span>' + fmtInt(d.value) + ' req</span></div>';
+      tooltip.style.left = px + 'px';
+      tooltip.style.top = py + 'px';
+      tooltip.classList.add('show');
+    });
+    rect.addEventListener('mouseleave', () => { rect.style.opacity = '1'; hideTooltip(tooltip); });
+    group.appendChild(rect);
+  });
+  svg.appendChild(group);
+
+  // x-axis year labels (Jan of each year)
+  adoptionSeries.forEach((d, i) => {
+    if (d.month === 0) {
+      const x = marginLeft + i * (plotW / n);
+      const t = svgEl('text', { x, y: H - marginBottom + 18, class: 'axis-label' });
+      t.textContent = d.year;
+      svg.appendChild(t);
+    }
+  });
+
+  svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: marginTop + plotH, y2: marginTop + plotH, class: 'axis-line' }));
+}
+
+/* ============================================================
+   5. CHART: SANKEY (signature element)
+   ============================================================ */
+function renderSankey() {
+  const svg = document.getElementById('sankey-chart');
+  const tooltip = document.getElementById('sankey-tooltip');
+  const wrap = document.getElementById('sankey-wrap');
+  clearSvg(svg);
+
+  const W = 1200, H = 620;
+  const marginY = 30;
+  const nodeW = 14;
+  const colX = [60, 590, 1120];
+  const cols = [[], [], []];
+
+  sankeyData.nodes.forEach(n => cols[n.col].push(n));
+
+  // compute node "value" = max(inflow, outflow)
+  const nodeValue = {};
+  sankeyData.nodes.forEach(n => nodeValue[n.id] = 0);
+  sankeyData.links.forEach(l => {
+    nodeValue[l.source] += l.value;
+    nodeValue[l.target] += l.value;
+  });
+  sankeyData.nodes.forEach(n => {
+    const inflow = sankeyData.links.filter(l => l.target === n.id).reduce((s, l) => s + l.value, 0);
+    const outflow = sankeyData.links.filter(l => l.source === n.id).reduce((s, l) => s + l.value, 0);
+    nodeValue[n.id] = Math.max(inflow, outflow) || 1;
+  });
+
+  const availH = H - marginY * 2;
+  const nodeGap = 18;
+
+  // layout each column: height proportional to value, stacked with gaps
+  const positions = {};
+  cols.forEach((colNodes, ci) => {
+    const totalVal = colNodes.reduce((s, n) => s + nodeValue[n.id], 0) || 1;
+    const totalGap = nodeGap * (colNodes.length - 1);
+    const usableH = availH - totalGap;
+    let y = marginY;
+    colNodes.forEach(n => {
+      const h = Math.max(6, (nodeValue[n.id] / totalVal) * usableH);
+      positions[n.id] = { x: colX[ci], y, h, col: ci };
+      y += h + nodeGap;
+    });
+  });
+
+  // draw links first (behind nodes)
+  const linkLayer = svgEl('g');
+  // track cumulative offset per node for stacking multiple links
+  const outOffset = {}, inOffset = {};
+  sankeyData.nodes.forEach(n => { outOffset[n.id] = 0; inOffset[n.id] = 0; });
+
+  const maxLinkVal = Math.max(...sankeyData.links.map(l => l.value));
+
+  sankeyData.links.forEach((l, idx) => {
+    const sp = positions[l.source], tp = positions[l.target];
+    const sVal = nodeValue[l.source], tVal = nodeValue[l.target];
+    const linkHS = (l.value / sVal) * sp.h;
+    const linkHT = (l.value / tVal) * tp.h;
+
+    const y0 = sp.y + outOffset[l.source] + linkHS / 2;
+    const y1 = tp.y + inOffset[l.target] + linkHT / 2;
+    outOffset[l.source] += linkHS;
+    inOffset[l.target] += linkHT;
+
+    const x0 = sp.x + nodeW, x1 = tp.x;
+    const midX = (x0 + x1) / 2;
+    const strokeW = Math.max(1.5, (l.value / maxLinkVal) * 40);
+
+    const path = svgEl('path', {
+      d: 'M ' + x0 + ' ' + y0 + ' C ' + midX + ' ' + y0 + ', ' + midX + ' ' + y1 + ', ' + x1 + ' ' + y1,
+      fill: 'none',
+      stroke: COLOR.blue,
+      'stroke-width': strokeW,
+      'stroke-opacity': 0.18,
+      'data-link-idx': idx
+    });
+    path.style.transition = 'stroke-opacity 100ms ease';
+    path.addEventListener('mouseenter', () => {
+      path.setAttribute('stroke-opacity', '0.55');
+      const b = wrap.getBoundingClientRect();
+      const px = (midX / W) * b.width, py = ((y0 + y1) / 2 / H) * b.height;
+      const srcLabel = sankeyData.nodes.find(n => n.id === l.source).label;
+      const tgtLabel = sankeyData.nodes.find(n => n.id === l.target).label;
+      tooltip.innerHTML =
+        '<div class="tt-title">' + srcLabel + ' → ' + tgtLabel + '</div>' +
+        '<div class="tt-row"><span>Flow volume</span><span>' + fmtInt(l.value) + '</span></div>';
+      tooltip.style.left = px + 'px';
+      tooltip.style.top = py + 'px';
+      tooltip.classList.add('show');
+    });
+    path.addEventListener('mouseleave', () => { path.setAttribute('stroke-opacity', '0.18'); hideTooltip(tooltip); });
+    linkLayer.appendChild(path);
+  });
+  svg.appendChild(linkLayer);
+
+  // draw nodes
+  const nodeLayer = svgEl('g');
+  sankeyData.nodes.forEach(n => {
+    const p = positions[n.id];
+    const colColor = p.col === 0 ? COLOR.gray70 : (p.col === 1 ? COLOR.blue : COLOR.gray100);
+    const rect = svgEl('rect', { x: p.x, y: p.y, width: nodeW, height: p.h, fill: colColor });
+    nodeLayer.appendChild(rect);
+
+    const label = svgEl('text', {
+      x: p.col === 2 ? p.x - 10 : p.x + nodeW + 10,
+      y: p.y + p.h / 2 + 4,
+      'text-anchor': p.col === 2 ? 'end' : 'start',
+      class: 'axis-label',
+      fill: COLOR.gray100
+    });
+    label.style.fontSize = '12px';
+    label.textContent = n.label;
+    nodeLayer.appendChild(label);
+
+    const valLabel = svgEl('text', {
+      x: p.col === 2 ? p.x - 10 : p.x + nodeW + 10,
+      y: p.y + p.h / 2 + 18,
+      'text-anchor': p.col === 2 ? 'end' : 'start',
+      class: 'axis-label'
+    });
+    valLabel.textContent = fmtInt(nodeValue[n.id]) + ' vol';
+    nodeLayer.appendChild(valLabel);
+  });
+  svg.appendChild(nodeLayer);
+
+  // column headers
+  const headers = ['Sources', 'Point‑in‑Time Store', 'Consumers'];
+  headers.forEach((h, i) => {
+    const t = svgEl('text', { x: colX[i], y: 14, class: 'axis-label', 'font-weight': 'bold' });
+    t.style.fontSize = '11px';
+    t.style.textTransform = 'uppercase';
+    t.setAttribute('fill', COLOR.gray70);
+    t.textContent = h;
+    svg.appendChild(t);
+  });
+}
+
+/* ============================================================
+   6. CHART: RISK BARS (horizontal, mirrors reference layout)
+   ============================================================ */
+function renderRiskBars() {
+  renderHBarChart('risk-bar-chart', 'risk-bar-tooltip', 'risk-bar-wrap', riskPortfolios.map(p => ({
+    label: p.name, value: p.pctAtRisk, fmt: v => fmtPct(v)
+  })), { maxOverride: 14, color: COLOR.blue, riskThreshold: 10, riskColor: COLOR.red });
+
+  renderHBarChart('risk-proj-chart', 'risk-proj-tooltip', 'risk-proj-wrap', riskPortfolios.map(p => ({
+    label: p.name, value: p.projected, fmt: v => '$' + fmtCompact(v)
+  })), { color: COLOR.gray70 });
+}
+
+function renderHBarChart(svgId, ttId, wrapId, items, opts) {
+  opts = opts || {};
+  const svg = document.getElementById(svgId);
+  const tooltip = document.getElementById(ttId);
+  const wrap = document.getElementById(wrapId);
+  clearSvg(svg);
+
+  const W = 560, H = 260;
+  const marginLeft = 220, marginRight = 20, marginTop = 10, marginBottom = 24;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  const maxVal = opts.maxOverride || Math.max(...items.map(d => d.value)) * 1.15;
+  const rowH = plotH / items.length;
+  const barH = rowH * 0.55;
+
+  items.forEach((d, i) => {
+    const y = marginTop + i * rowH + (rowH - barH) / 2;
+    const w = (d.value / maxVal) * plotW;
+    const color = (opts.riskThreshold && d.value >= opts.riskThreshold) ? opts.riskColor : (opts.color || COLOR.blue);
+
+    const label = svgEl('text', { x: marginLeft - 10, y: y + barH / 2 + 4, 'text-anchor': 'end', class: 'axis-label' });
+    label.style.fontSize = '11px';
+    label.textContent = d.label.length > 26 ? d.label.slice(0, 25) + '…' : d.label;
+    svg.appendChild(label);
+
+    const track = svgEl('rect', { x: marginLeft, y, width: plotW, height: barH, fill: COLOR.gray10 });
+    svg.appendChild(track);
+
+    const rect = svgEl('rect', { x: marginLeft, y, width: Math.max(1, w), height: barH, fill: color });
+    rect.style.transition = 'opacity 90ms ease';
+    rect.addEventListener('mouseenter', () => {
+      rect.style.opacity = '0.75';
+      const b = wrap.getBoundingClientRect();
+      const px = ((marginLeft + w) / W) * b.width, py = (y / H) * b.height;
+      tooltip.innerHTML = '<div class="tt-title">' + d.label + '</div><div class="tt-row"><span>Value</span><span>' + d.fmt(d.value) + '</span></div>';
+      tooltip.style.left = px + 'px'; tooltip.style.top = py + 'px';
+      tooltip.classList.add('show');
+    });
+    rect.addEventListener('mouseleave', () => { rect.style.opacity = '1'; hideTooltip(tooltip); });
+    svg.appendChild(rect);
+
+    const valLabel = svgEl('text', { x: marginLeft + Math.max(1, w) + 6, y: y + barH / 2 + 4, class: 'axis-label' });
+    valLabel.style.fontSize = '11px';
+    valLabel.textContent = d.fmt(d.value);
+    svg.appendChild(valLabel);
+  });
+
+  svg.appendChild(svgEl('line', { x1: marginLeft, x2: marginLeft, y1: marginTop, y2: H - marginBottom, class: 'axis-line' }));
+}
+
+/* ============================================================
+   7. CHART: RISK TREND LINE (with slider)
+   ============================================================ */
+let riskRange = { lo: 18, hi: 24 }; // indices into riskTrend (24 months)
+
+function renderRiskLine() {
+  const svg = document.getElementById('risk-line-chart');
+  const tooltip = document.getElementById('risk-line-tooltip');
+  const wrap = document.getElementById('risk-line-wrap');
+  clearSvg(svg);
+
+  const data = riskTrend.slice(riskRange.lo, riskRange.hi);
+  if (data.length < 2) return;
+
+  const W = 1160, H = 280;
+  const marginLeft = 64, marginRight = 64, marginTop = 20, marginBottom = 30;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  const maxV1 = Math.max(...data.map(d => d.projectedChargeOff)) * 1.1;
+  const minV1 = Math.min(...data.map(d => d.projectedChargeOff)) * 0.9;
+  const maxV2 = Math.max(...data.map(d => d.xLevelBalance)) * 1.15;
+
+  const xFor = i => marginLeft + (i / (data.length - 1)) * plotW;
+  const yFor1 = v => marginTop + plotH - ((v - minV1) / (maxV1 - minV1)) * plotH;
+  const yFor2 = v => marginTop + plotH - (v / maxV2) * plotH;
+
+  // gridlines
+  for (let i = 0; i <= 4; i++) {
+    const y = marginTop + (plotH / 4) * i;
+    svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: y, y2: y, class: 'gridline' }));
+  }
+
+  // area fill for x-level balance (secondary axis) — mirrors reference's red area chart
+  let areaPath = 'M ' + xFor(0) + ' ' + (marginTop + plotH);
+  data.forEach((d, i) => { areaPath += ' L ' + xFor(i) + ' ' + yFor2(d.xLevelBalance); });
+  areaPath += ' L ' + xFor(data.length - 1) + ' ' + (marginTop + plotH) + ' Z';
+  svg.appendChild(svgEl('path', { d: areaPath, fill: COLOR.red, 'fill-opacity': '0.12' }));
+
+  let linePath2 = '';
+  data.forEach((d, i) => { linePath2 += (i === 0 ? 'M ' : ' L ') + xFor(i) + ' ' + yFor2(d.xLevelBalance); });
+  svg.appendChild(svgEl('path', { d: linePath2, fill: 'none', stroke: COLOR.red, 'stroke-width': 2 }));
+
+  // primary line (projected charge off)
+  let linePath1 = '';
+  data.forEach((d, i) => { linePath1 += (i === 0 ? 'M ' : ' L ') + xFor(i) + ' ' + yFor1(d.projectedChargeOff); });
+  svg.appendChild(svgEl('path', { d: linePath1, fill: 'none', stroke: COLOR.gray100, 'stroke-width': 2.5 }));
+
+  // hover targets
+  data.forEach((d, i) => {
+    const hit = svgEl('circle', { cx: xFor(i), cy: yFor1(d.projectedChargeOff), r: 8, fill: 'transparent' });
+    hit.addEventListener('mouseenter', () => {
+      const b = wrap.getBoundingClientRect();
+      const px = (xFor(i) / W) * b.width, py = (yFor1(d.projectedChargeOff) / H) * b.height;
+      tooltip.innerHTML =
+        '<div class="tt-title">' + d.date.toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' }) + '</div>' +
+        '<div class="tt-row"><span><span class="swatch" style="background:' + COLOR.gray100 + '"></span>Projected charge‑off</span><span>$' + d.projectedChargeOff.toFixed(2) + 'M</span></div>' +
+        '<div class="tt-row"><span><span class="swatch" style="background:' + COLOR.red + '"></span>X‑Level balance</span><span>$' + d.xLevelBalance.toFixed(2) + 'M</span></div>';
+      tooltip.style.left = px + 'px'; tooltip.style.top = py + 'px';
+      tooltip.classList.add('show');
+
+      svg.querySelectorAll('.hoverdot').forEach(n => n.remove());
+      svg.appendChild(svgEl('circle', { cx: xFor(i), cy: yFor1(d.projectedChargeOff), r: 4, fill: COLOR.gray100, class: 'hoverdot' }));
+    });
+    hit.addEventListener('mouseleave', () => { hideTooltip(tooltip); svg.querySelectorAll('.hoverdot').forEach(n => n.remove()); });
+    svg.appendChild(hit);
+  });
+
+  // x-axis labels — sparse
+  const step = Math.max(1, Math.round(data.length / 7));
+  data.forEach((d, i) => {
+    if (i % step === 0 || i === data.length - 1) {
+      const t = svgEl('text', { x: xFor(i), y: H - marginBottom + 18, 'text-anchor': 'middle', class: 'axis-label' });
+      t.textContent = d.date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+      svg.appendChild(t);
+    }
+  });
+
+  // start/end callouts (mirrors reference's labeled endpoints)
+  const first = data[0], last = data[data.length - 1];
+  const t0 = svgEl('text', { x: xFor(0) + 6, y: yFor1(first.projectedChargeOff) - 10, class: 'axis-label', 'font-weight': '600' });
+  t0.setAttribute('fill', COLOR.gray100);
+  t0.textContent = '$' + first.projectedChargeOff.toFixed(2) + 'M';
+  svg.appendChild(t0);
+
+  const t1 = svgEl('text', { x: xFor(data.length - 1) - 6, y: yFor1(last.projectedChargeOff) - 10, 'text-anchor': 'end', class: 'axis-label', 'font-weight': '600' });
+  t1.setAttribute('fill', COLOR.gray100);
+  t1.textContent = '$' + last.projectedChargeOff.toFixed(2) + 'M';
+  svg.appendChild(t1);
+
+  svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: marginTop + plotH, y2: marginTop + plotH, class: 'axis-line' }));
+}
+
+/* -------- slider interaction -------- */
+function initRiskSlider() {
+  const trackWrap = document.getElementById('range-track-wrap');
+  const fill = document.getElementById('range-fill');
+  const loHandle = document.getElementById('range-handle-lo');
+  const hiHandle = document.getElementById('range-handle-hi');
+  const loLabel = document.getElementById('range-start-label');
+  const hiLabel = document.getElementById('range-end-label');
+  const total = riskTrend.length - 1;
+
+  function pctFor(idx) { return (idx / total) * 100; }
+
+  function paint() {
+    const loPct = pctFor(riskRange.lo), hiPct = pctFor(riskRange.hi);
+    loHandle.style.left = loPct + '%';
+    hiHandle.style.left = hiPct + '%';
+    fill.style.left = loPct + '%';
+    fill.style.width = (hiPct - loPct) + '%';
+    loLabel.textContent = riskTrend[riskRange.lo].date.toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+    hiLabel.textContent = riskTrend[riskRange.hi].date.toLocaleString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+  paint();
+
+  function idxFromClientX(clientX) {
+    const rect = trackWrap.getBoundingClientRect();
+    const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    return Math.round(pct * total);
+  }
+
+  function makeDraggable(handle, isLo) {
+    function onMove(clientX) {
+      const idx = idxFromClientX(clientX);
+      if (isLo) riskRange.lo = Math.min(idx, riskRange.hi - 1);
+      else riskRange.hi = Math.max(idx, riskRange.lo + 1);
+      riskRange.lo = Math.max(0, riskRange.lo);
+      riskRange.hi = Math.min(total, riskRange.hi);
+      paint();
+      renderRiskLine();
+    }
+    handle.addEventListener('pointerdown', (e) => {
+      handle.setPointerCapture(e.pointerId);
+      const move = (ev) => onMove(ev.clientX);
+      const up = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', up);
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', up);
+    });
+    handle.addEventListener('keydown', (e) => {
+      let delta = 0;
+      if (e.key === 'ArrowLeft') delta = -1;
+      if (e.key === 'ArrowRight') delta = 1;
+      if (delta === 0) return;
+      e.preventDefault();
+      if (isLo) riskRange.lo = Math.min(Math.max(0, riskRange.lo + delta), riskRange.hi - 1);
+      else riskRange.hi = Math.max(Math.min(total, riskRange.hi + delta), riskRange.lo + 1);
+      paint();
+      renderRiskLine();
+    });
+  }
+  makeDraggable(loHandle, true);
+  makeDraggable(hiHandle, false);
+
+  document.querySelectorAll('#risk-range-presets button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#risk-range-presets button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const months = parseInt(btn.dataset.months, 10);
+      riskRange.hi = total;
+      riskRange.lo = Math.max(0, total - months);
+      paint();
+      renderRiskLine();
+    });
+  });
+}
+
+/* ============================================================
+   8. CHART: HISTOGRAM (score distribution)
+   ============================================================ */
+function renderHistogram() {
+  const svg = document.getElementById('hist-chart');
+  const tooltip = document.getElementById('hist-tooltip');
+  const wrap = document.getElementById('hist-wrap');
+  clearSvg(svg);
+
+  const W = 720, H = 260;
+  const marginLeft = 56, marginRight = 12, marginTop = 12, marginBottom = 30;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  const maxVal = Math.max(...histogramData.map(d => d.balance)) * 1.08;
+  const barW = plotW / histogramData.length;
+
+  for (let i = 0; i <= 4; i++) {
+    const v = (maxVal / 4) * i;
+    const y = marginTop + plotH - (v / maxVal) * plotH;
+    svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: y, y2: y, class: 'gridline' }));
+    const t = svgEl('text', { x: marginLeft - 8, y: y + 4, 'text-anchor': 'end', class: 'axis-label' });
+    t.textContent = '$' + fmtCompact(v);
+    svg.appendChild(t);
+  }
+
+  histogramData.forEach((d, i) => {
+    const x = marginLeft + i * barW;
+    const h = (d.balance / maxVal) * plotH;
+    const y = marginTop + plotH - h;
+    const rect = svgEl('rect', { x, y, width: Math.max(1, barW - 1), height: h, fill: d.band.color });
+    rect.addEventListener('mouseenter', () => {
+      rect.style.opacity = '0.7';
+      const b = wrap.getBoundingClientRect();
+      tooltip.innerHTML = '<div class="tt-title">Score ' + d.score + '</div><div class="tt-row"><span>' + d.band.label + '</span><span>$' + fmtCompact(d.balance) + '</span></div>';
+      tooltip.style.left = ((x / W) * b.width) + 'px';
+      tooltip.style.top = ((y / H) * b.height) + 'px';
+      tooltip.classList.add('show');
+    });
+    rect.addEventListener('mouseleave', () => { rect.style.opacity = '1'; hideTooltip(tooltip); });
+    svg.appendChild(rect);
+  });
+
+  [300, 450, 600, 700, 800, 850].forEach(score => {
+    const idx = histogramData.findIndex(d => d.score >= score);
+    if (idx < 0) return;
+    const x = marginLeft + idx * barW;
+    const t = svgEl('text', { x, y: H - marginBottom + 18, 'text-anchor': 'middle', class: 'axis-label' });
+    t.textContent = score;
+    svg.appendChild(t);
+  });
+
+  svg.appendChild(svgEl('line', { x1: marginLeft, x2: W - marginRight, y1: marginTop + plotH, y2: marginTop + plotH, class: 'axis-line' }));
+
+  const legend = document.getElementById('hist-legend');
+  legend.innerHTML = '';
+  scoreBands.forEach(b => {
+    const item = document.createElement('span');
+    item.className = 'legend-item';
+    item.innerHTML = '<span class="legend-swatch" style="background:' + b.color + '"></span>' + b.label;
+    legend.appendChild(item);
+  });
+}
+
+/* ============================================================
+   9. CHART: FEATURE IMPORTANCE (ranked, with bar-chart glyph like CLI output)
+   ============================================================ */
+let currentImportanceModel = 'underwriting';
+
+function renderImportanceChart() {
+  const svg = document.getElementById('importance-chart');
+  const tooltip = document.getElementById('importance-tooltip');
+  const wrap = document.getElementById('importance-wrap');
+  clearSvg(svg);
+
+  const items = importanceByModel[currentImportanceModel];
+  const W = 1100, H = 480;
+  const marginLeft = 240, marginRight = 90, marginTop = 10, marginBottom = 20;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  const maxVal = Math.max(...items.map(d => d[1])) * 1.15;
+  const rowH = plotH / items.length;
+  const barH = rowH * 0.6;
+
+  items.forEach((d, i) => {
+    const [name, val] = d;
+    const y = marginTop + i * rowH + (rowH - barH) / 2;
+    const w = (val / maxVal) * plotW;
+
+    const rank = svgEl('text', { x: marginLeft - 210, y: y + barH / 2 + 4, class: 'axis-label' });
+    rank.style.fontSize = '11px';
+    rank.textContent = String(i + 1).padStart(2, '0');
+    svg.appendChild(rank);
+
+    const label = svgEl('text', { x: marginLeft - 10, y: y + barH / 2 + 4, 'text-anchor': 'end', class: 'axis-label' });
+    label.style.fontSize = '12px';
+    label.setAttribute('fill', COLOR.gray100);
+    label.textContent = name;
+    svg.appendChild(label);
+
+    const track = svgEl('rect', { x: marginLeft, y, width: plotW, height: barH, fill: COLOR.gray10 });
+    svg.appendChild(track);
+
+    const rect = svgEl('rect', { x: marginLeft, y, width: Math.max(1, w), height: barH, fill: i < 3 ? COLOR.blue : COLOR.blueLight });
+    rect.style.transition = 'opacity 90ms ease';
+    rect.addEventListener('mouseenter', () => {
+      rect.style.opacity = '0.75';
+      const b = wrap.getBoundingClientRect();
+      tooltip.innerHTML = '<div class="tt-title">' + name + '</div><div class="tt-row"><span>Importance</span><span>' + val.toFixed(4) + '</span></div><div class="tt-row"><span>Rank</span><span>#' + (i + 1) + ' of ' + items.length + '</span></div>';
+      tooltip.style.left = ((marginLeft + w) / W * b.width) + 'px';
+      tooltip.style.top = (y / H * b.height) + 'px';
+      tooltip.classList.add('show');
+    });
+    rect.addEventListener('mouseleave', () => { rect.style.opacity = '1'; hideTooltip(tooltip); });
+    svg.appendChild(rect);
+
+    const valLabel = svgEl('text', { x: marginLeft + Math.max(1, w) + 8, y: y + barH / 2 + 4, class: 'axis-label' });
+    valLabel.textContent = val.toFixed(4);
+    svg.appendChild(valLabel);
+  });
+}
+
+document.querySelectorAll('#importance-model-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#importance-model-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentImportanceModel = btn.dataset.model;
+    renderImportanceChart();
+  });
+});
+
+/* ============================================================
+   10. TABLES: activity log, service mix, leakage findings, PIT rows, batch rows
+   ============================================================ */
+function renderActivityTable() {
+  const tbody = document.getElementById('activity-tbody');
+  tbody.innerHTML = '';
+  activityLog.forEach(row => {
+    const tr = document.createElement('tr');
+    const statusTag = row.status === 200
+      ? '<span class="tag green">200</span>'
+      : (row.status >= 500 ? '<span class="tag red">' + row.status + '</span>' : '<span class="tag gray">' + row.status + '</span>');
+    tr.innerHTML =
+      '<td>' + row.ts.toISOString().slice(0, 19).replace('T', ' ') + '</td>' +
+      '<td>' + row.service + '</td>' +
+      '<td>' + row.entity + '</td>' +
+      '<td>' + statusTag + '</td>' +
+      '<td class="cell-num">' + row.latency + 'ms</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function renderServiceMix() {
+  const container = document.getElementById('mix-list');
+  container.innerHTML = '';
+  const maxPct = Math.max(...serviceMix.map(m => m.pct));
+  serviceMix.forEach(m => {
+    const row = document.createElement('div');
+    row.style.marginBottom = '14px';
+    row.innerHTML =
+      '<div class="flex-between" style="margin-bottom:4px;"><span class="mono small">' + m.name + '</span><span class="mono small">' + m.pct.toFixed(1) + '%</span></div>' +
+      '<div class="bar-cell"><div class="track"><div class="fill" style="width:' + (m.pct / maxPct * 100) + '%"></div></div></div>';
+    container.appendChild(row);
+  });
+}
+
+/* --- Generic sortable/filterable table binder --- */
+function bindSortableTable(opts) {
+  // opts: { tbodyId, theadSelector, data, columns: [{key,fmt}], searchInputId, searchKeys, rowCountId }
+  let sortKey = null, sortDir = 1;
+  let filterText = '';
+
+  function applyAndRender() {
+    let rows = opts.data.slice();
+    if (filterText) {
+      const q = filterText.toLowerCase();
+      rows = rows.filter(r => opts.searchKeys.some(k => String(r[k]).toLowerCase().includes(q)));
+    }
+    if (sortKey) {
+      rows.sort((a, b) => {
+        const av = a[sortKey], bv = b[sortKey];
+        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir;
+        return String(av).localeCompare(String(bv)) * sortDir;
+      });
+    }
+    const tbody = document.getElementById(opts.tbodyId);
+    tbody.innerHTML = '';
+    rows.slice(0, opts.limit || 500).forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = opts.columns.map(c => {
+        const raw = r[c.key];
+        const val = c.fmt ? c.fmt(raw, r) : raw;
+        return '<td class="' + (c.num ? 'cell-num' : '') + '">' + val + '</td>';
+      }).join('');
+      tbody.appendChild(tr);
+    });
+    if (opts.rowCountId) {
+      document.getElementById(opts.rowCountId).textContent = fmtInt(rows.length) + ' row' + (rows.length === 1 ? '' : 's') + (opts.limit && rows.length > opts.limit ? ' (showing ' + opts.limit + ')' : '');
+    }
+  }
+
+  if (opts.searchInputId) {
+    document.getElementById(opts.searchInputId).addEventListener('input', (e) => {
+      filterText = e.target.value;
+      applyAndRender();
+    });
+  }
+
+  if (opts.theadSelector) {
+    document.querySelectorAll(opts.theadSelector).forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.key;
+        if (!key) return;
+        if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+        document.querySelectorAll(opts.theadSelector).forEach(h => h.querySelector('.arrow') && h.querySelector('.arrow').remove());
+        const arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = sortDir === 1 ? '↑' : '↓';
+        th.appendChild(arrow);
+        applyAndRender();
+      });
+    });
+  }
+
+  applyAndRender();
+  return applyAndRender;
+}
+
+function severityTag(sev) {
+  if (sev === 'high') return '<span class="tag red">high</span>';
+  if (sev === 'medium') return '<span class="tag gray">medium</span>';
+  return '<span class="tag green">low</span>';
+}
+
+function renderLeakageTable() {
+  bindSortableTable({
+    tbodyId: 'leakage-tbody',
+    theadSelector: '#leakage-table thead th',
+    data: leakageFindings,
+    searchInputId: 'leakage-search',
+    searchKeys: ['entity_id', 'feature', 'portfolio'],
+    rowCountId: 'leakage-count',
+    columns: [
+      { key: 'entity_id' },
+      { key: 'feature' },
+      { key: 'portfolio' },
+      { key: 'delta_hours', num: true, fmt: v => v.toFixed(1) },
+      { key: 'severity', fmt: severityTag }
+    ]
+  });
+}
+
+function renderPitTable() {
+  bindSortableTable({
+    tbodyId: 'pit-tbody',
+    theadSelector: '#pit-table thead th',
+    data: pitRows,
+    searchInputId: 'pit-search',
+    searchKeys: ['claim_id', 'policy_id'],
+    rowCountId: 'pit-rowcount',
+    limit: 60,
+    columns: [
+      { key: 'claim_id' }, { key: 'policy_id' }, { key: 'event_timestamp' }, { key: 'feature_timestamp' },
+      { key: 'claim_severity_score', num: true },
+      { key: 'prior_claims_24m', num: true },
+      { key: 'label_charge_off', num: true, fmt: v => v === 1 ? '<span class="tag red">1</span>' : '0' }
+    ]
+  });
+  document.getElementById('pit-footer-count').textContent = fmtInt(pitRows.length) + ' total rows in payload';
+}
+
+function renderBatchTable() {
+  const tbody = document.getElementById('batch-tbody');
+  tbody.innerHTML = '';
+  batchRows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + r.entity_id + '</td>' +
+      '<td>' + r.entity_type + '</td>' +
+      '<td class="cell-num">' + r.telematics_score + '</td>' +
+      '<td class="cell-num">' + r.credit_band + '</td>' +
+      '<td class="cell-num">' + r.exposure_months + '</td>' +
+      '<td>' + r.region + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   11. ONLINE LOOKUP PANEL
+   ============================================================ */
+function renderEntityResult(tbodyId, entity) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  Object.keys(entity).forEach(k => {
+    if (k === 'id') return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td class="mono" style="color:var(--gray-60); width:55%;">' + k + '</td><td class="cell-num">' + entity[k] + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function initOnlineLookups() {
+  const recentPolicies = Array.from({ length: 6 }, () => 'POL-' + randInt(1000, 9999));
+  const recentClaims = Array.from({ length: 6 }, () => 'CLM-' + randInt(10000, 99999));
+
+  const policyRecentEl = document.getElementById('policy-recent');
+  recentPolicies.forEach(id => {
+    const chip = document.createElement('button');
+    chip.className = 'tag gray';
+    chip.style.cursor = 'pointer';
+    chip.textContent = id;
+    chip.addEventListener('click', () => { document.getElementById('policy-input').value = id; doPolicyLookup(); });
+    policyRecentEl.appendChild(chip);
+  });
+
+  const claimRecentEl = document.getElementById('claim-recent');
+  recentClaims.forEach(id => {
+    const chip = document.createElement('button');
+    chip.className = 'tag gray';
+    chip.style.cursor = 'pointer';
+    chip.textContent = id;
+    chip.addEventListener('click', () => { document.getElementById('claim-input').value = id; doClaimLookup(); });
+    claimRecentEl.appendChild(chip);
+  });
+
+  function doPolicyLookup() {
+    const id = document.getElementById('policy-input').value.trim() || 'POL-0000';
+    renderEntityResult('policy-result-tbody', buildOnlineEntity(id, false));
+  }
+  function doClaimLookup() {
+    const id = document.getElementById('claim-input').value.trim() || 'CLM-00000';
+    renderEntityResult('claim-result-tbody', buildOnlineEntity(id, true));
+  }
+
+  document.getElementById('policy-lookup-btn').addEventListener('click', doPolicyLookup);
+  document.getElementById('claim-lookup-btn').addEventListener('click', doClaimLookup);
+  document.getElementById('policy-input').addEventListener('keydown', e => { if (e.key === 'Enter') doPolicyLookup(); });
+  document.getElementById('claim-input').addEventListener('keydown', e => { if (e.key === 'Enter') doClaimLookup(); });
+
+  doPolicyLookup();
+  doClaimLookup();
+}
+
+/* ============================================================
+   12. RENDER ORCHESTRATION
+   ============================================================ */
+let chartsRenderedOnce = false;
+
+function renderAllChartsOnce() {
+  // SVGs with viewBox render correctly even in hidden panels, but we still
+  // re-invoke on tab switch in case a browser reports zero client width
+  // for a display:none ancestor at initial paint.
+  renderAdoptionChart();
+  renderSankey();
+  renderRiskBars();
+  renderRiskLine();
+  renderHistogram();
+  renderImportanceChart();
+}
+
+function initDashboard() {
+  renderActivityTable();
+  renderServiceMix();
+  renderLeakageTable();
+  renderPitTable();
+  renderBatchTable();
+  initRiskSlider();
+  initOnlineLookups();
+  renderAllChartsOnce();
+  window.addEventListener('resize', () => {
+    clearTimeout(window.__featsrv_resize_t);
+    window.__featsrv_resize_t = setTimeout(renderAllChartsOnce, 120);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+  initDashboard();
+}
+</script>
+<button onclick="window.print()" style="position:fixed; bottom:20px; right:20px; z-index:1000; padding:10px 16px; background:#0f62fe; color:#fff; border:none; cursor:pointer; font-family:'IBM Plex Sans'; font-size:13px;">
+  🖨 Save as PDF
+</button>
+</body>
+</html>

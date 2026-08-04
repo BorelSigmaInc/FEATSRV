@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+<#!/usr/bin/env bash
 # Early definition to avoid re-exec timing issues
 confirm() {
     local prompt="$1"
@@ -227,6 +227,20 @@ open_saved_file() {
             fi
             ;;
     esac
+}
+
+# ---------- Open the FEATSRV Dashboard ----------
+open_dashboard() {
+    local url="$API/static/dashboard.html"
+    if command -v xdg-open &>/dev/null; then
+        xdg-open "$url" &>/dev/null &
+    elif command -v open &>/dev/null; then
+        open "$url"
+    elif command -v start &>/dev/null; then
+        start "" "$url"
+    else
+        echo -e "${C_YELLOW}Please open this URL in your browser:${C_RESET} $url"
+    fi
 }
 
 # ---------- Helpers ----------
@@ -538,5 +552,5 @@ while true; do
         *) echo -e "${C_RED}Invalid choice — enter a number from 0 to 7.${C_RESET}" ;;
     esac
     echo ""
-    read -r -p "Press Enter to return to menu..." _
+    read -r -p "Press Enter to open Dashboard...." _
 done
