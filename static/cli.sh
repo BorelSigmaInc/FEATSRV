@@ -553,4 +553,5 @@ while true; do
     esac
     echo ""
     read -r -p "Press Enter to open Dashboard...." _
+    xdg-open "$API/static/dashboard.html" &>/dev/null &
 done
