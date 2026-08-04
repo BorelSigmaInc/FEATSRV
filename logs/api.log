@@ -1,0 +1,22 @@
+nohup: ignoring input
+INFO:     Started server process [36847]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:48427 (Press CTRL+C to quit)
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:35156 - "GET /online/policy/POL-0000 HTTP/1.1" 200 OK
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:35714 - "GET /online/claim/CLM-00000 HTTP/1.1" 200 OK
+/home/rrmr/Home_content/Desktop/RRMR/BProjects/BorelSIgmaInc/Projects/Client Projects/FEATSRV/src/api.py:74: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+  df = pd.DataFrame([e.dict() for e in req.entities])
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:40230 - "POST /offline HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49298 - "GET /health HTTP/1.1" 200 OK
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:49300 - "GET /online/policy/POL-0000 HTTP/1.1" 200 OK
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:49312 - "GET /online/claim/CLM-00000 HTTP/1.1" 200 OK
+/home/rrmr/Home_content/Desktop/RRMR/BProjects/BorelSIgmaInc/Projects/Client Projects/FEATSRV/src/api.py:74: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+  df = pd.DataFrame([e.dict() for e in req.entities])
+WARNING:root:_list_feature_views will make breaking changes. Please use _list_batch_feature_views instead. _list_feature_views will behave like _list_all_feature_views in the future.
+INFO:     127.0.0.1:49316 - "POST /offline HTTP/1.1" 200 OK

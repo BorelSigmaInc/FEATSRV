@@ -1,0 +1,53 @@
+
+T
+5
+policyInsurance policy entity"	policy_idJfeatSRV
+ù¬ÈÓ°ÌË»ÖºÈÓ ç3
+Q
+2
+claimInsurance claim entity"claim_idJfeatSRV
+ù¬ÈÓÈĞÇ»ÖºÈÓèïè3
+=
+
+__dummy"
+__dummy_idJfeatSRV
+ù¬ÈÓø®Í»ÖºÈÓ³ê31"$9f87a823-2d64-48bb-91cf-5b2d1b5a4b89*×ºÈÓ°Ãõ«2İ
+˜
+policy_featuresfeatSRVpolicy"
+initial_premium"
+
+region"
+inception_date2€ƒ˜K:inception_dateZdata/raw/policies.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢data/raw/policies.parquet@R&Policy-level features: premium, regionb
+	policy_id@
+ù¬ÈÓø¨Ï»×ºÈÓÁÀô
+€È¬„²ÈÓ
+€È¬ÖºÈÓ2Ë
+†
+address_featuresfeatSRVpolicy"
+address2€ƒ˜K:‰
+valid_fromZ" data/raw/address_history.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢ data/raw/address_history.parquet@R0Current address of the policyholder (SCD Type 2)b
+	policy_id@
+ù¬ÈÓø“Ö»×ºÈÓèı„
+€È¬„²ÈÓ
+€È¬ÖºÈÓ2Ñ
+Œ
+claim_featuresfeatSRVclaim"
+	policy_id"
+claim_amount"
+
+fraud_flag2€ƒ˜K:xreport_dateZdata/raw/claims.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢data/raw/claims.parquet@R(Claim-level features: amount, fraud flagb
+claim_id@
+ù¬ÈÓ˜§Ú»×ºÈÓ˜æì«
+€È¬„²ÈÓ
+€È¬ÖºÈÓR±
+¹
+,feast.infra.online_stores.sqlite.SqliteTable"ˆ
+l/home/rrmr/Home_content/Desktop/RRMR/BProjects/BorelSIgmaInc/Projects/Client Projects/FEATSRV/data/online.dbfeatSRV_address_features
+·
+,feast.infra.online_stores.sqlite.SqliteTable"†
+l/home/rrmr/Home_content/Desktop/RRMR/BProjects/BorelSIgmaInc/Projects/Client Projects/FEATSRV/data/online.dbfeatSRV_claim_features
+¸
+,feast.infra.online_stores.sqlite.SqliteTable"‡
+l/home/rrmr/Home_content/Desktop/RRMR/BProjects/BorelSIgmaInc/Projects/Client Projects/FEATSRV/data/online.dbfeatSRV_policy_featuresb‚report_dateZdata/raw/claims.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢data/raw/claims.parquetªfeatSRVb‰inception_dateZdata/raw/policies.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢data/raw/policies.parquetªfeatSRVb“
+valid_fromZ" data/raw/address_history.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢ data/raw/address_history.parquetªfeatSRVz/
+featSRV$c2c49fbc-c724-4582-b0b8-7c2dbbe55364

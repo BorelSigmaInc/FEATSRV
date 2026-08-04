@@ -1,0 +1,9 @@
+project: featSRV
+registry: config/registry.db
+provider: local
+offline_store:
+  type: file
+online_store:
+  type: redis
+  connection_string: "localhost:6379"
+entity_key_serialization_version: 2
