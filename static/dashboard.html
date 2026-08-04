@@ -2314,7 +2314,6 @@ function renderEntityResult(tbodyId, entity) {
 }
 
 function initOnlineLookups() {
-  // Recent IDs (static demo list, same as before)
   const recentPolicies = ['POL-0000','POL-0001','POL-0002','POL-0003','POL-0004','POL-0005'];
   const recentClaims   = ['CLM-00000','CLM-00001','CLM-00002','CLM-00003','CLM-00004','CLM-00005'];
 
@@ -2336,14 +2335,12 @@ function initOnlineLookups() {
 
   function doPolicyLookup() {
     const id = document.getElementById('policy-input').value.trim() || 'POL-0000';
-    // Fetch real data from static file (fallback to synthetic if not found)
     fetch('/static/data/policy_lookup.json')
       .then(r => r.json())
       .then(data => {
         renderEntityResult('policy-result-tbody', data);
       })
       .catch(() => {
-        // fallback if fetch fails (e.g. offline)
         renderEntityResult('policy-result-tbody', buildOnlineEntity(id, false));
       });
   }
