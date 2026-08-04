@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # FEATSRV – Point‑in‑Time Feature Serving CLI
 # Usage: curl -s https://featsrv.q-dit.com/cli | bash
+# Re-execute with terminal if stdin is not a tty (e.g., piped from curl)
+if [ ! -t 0 ]; then
+    TMP_SCRIPT=$(mktemp /tmp/featsrv-cli.XXXXXX.sh)
+    cat > "$TMP_SCRIPT"
+    exec bash "$TMP_SCRIPT" </dev/tty
+fi
+
 
 API="https://featsrv.q-dit.com"
 API_KEY=""
