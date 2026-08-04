@@ -1,4 +1,4 @@
-<#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Early definition to avoid re-exec timing issues
 confirm() {
     local prompt="$1"
