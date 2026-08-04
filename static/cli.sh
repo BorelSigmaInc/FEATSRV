@@ -14,7 +14,7 @@
 #  Version: 2.0.0
 # ==============================================================================
 
-set -uo pipefail
+set -o pipefail
 # Note: intentionally NOT using `set -e`. This is a long-lived interactive
 # session — a single failed curl or bad keystroke should return the user to
 # the menu, not kill the whole program.
@@ -272,7 +272,7 @@ service_pit_training() {
 
     create_response_dir
     echo -e "${C_YELLOW}Uploading and generating PIT training set...${C_RESET}"
-    RESPONSE=$(api_call POST "$API/pit-training" -F "file=@$FILE_PATH")
+    api_call POST "$API/pit-training" -F "file=@$FILE_PATH" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "PIT training set" || { save_response "pit_training_error.json" "$RESPONSE"; return; }
 
     save_response "pit_training_result.json" "$RESPONSE"
@@ -285,7 +285,7 @@ service_online_policy() {
     read -r -p "Policy ID (e.g., POL-0000): " PID
     [ -z "$PID" ] && { echo -e "${C_RED}No policy ID provided.${C_RESET}"; return; }
 
-    RESPONSE=$(api_call GET "$API/online/policy/$PID")
+    api_call GET "$API/online/policy/$PID" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Policy $PID" || { create_response_dir; save_response "policy_${PID}_error.json" "$RESPONSE"; return; }
 
     create_response_dir
@@ -299,7 +299,7 @@ service_online_claim() {
     read -r -p "Claim ID (e.g., CLM-00000): " CID
     [ -z "$CID" ] && { echo -e "${C_RED}No claim ID provided.${C_RESET}"; return; }
 
-    RESPONSE=$(api_call GET "$API/online/claim/$CID")
+    api_call GET "$API/online/claim/$CID" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Claim $CID" || { create_response_dir; save_response "claim_${CID}_error.json" "$RESPONSE"; return; }
 
     create_response_dir
@@ -321,7 +321,7 @@ service_batch_offline() {
     fi
 
     create_response_dir
-    RESPONSE=$(api_call POST "$API/offline" -H "Content-Type: application/json" -d "$PAYLOAD")
+    api_call POST "$API/offline" -H "Content-Type: application/json" -d "$PAYLOAD" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Batch offline features" || { save_response "batch_offline_error.json" "$RESPONSE"; return; }
 
     echo -e "${C_BOLD}Result:${C_RESET}"
@@ -336,7 +336,7 @@ service_leakage_audit() {
     require_file "$FILE_PATH" || return
 
     create_response_dir
-    RESPONSE=$(api_call POST "$API/leakage-audit" -F "file=@$FILE_PATH")
+    api_call POST "$API/leakage-audit" -F "file=@$FILE_PATH" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Leakage audit" || { save_response "leakage_audit_error.json" "$RESPONSE"; return; }
 
     echo -e "${C_BOLD}Leakage Audit Report:${C_RESET}"
@@ -347,7 +347,7 @@ service_leakage_audit() {
 service_feature_importance() {
     section "Feature Importance Summary"
     create_response_dir
-    RESPONSE=$(api_call GET "$API/feature-importance")
+    api_call GET "$API/feature-importance" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Feature importance" || { save_response "feature_importance_error.json" "$RESPONSE"; return; }
 
     echo -e "${C_BOLD}Top Features by Importance:${C_RESET}"
@@ -375,7 +375,7 @@ for item in data[:10]:
 
 service_health() {
     section "System Health Check"
-    RESPONSE=$(api_call GET "$API/health")
+    api_call GET "$API/health" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     if check_status "$HTTP_STATUS" "Health check"; then
         echo -e "${C_BOLD}Server Status:${C_RESET}"
         render_feature_table "{\"features\": $RESPONSE}" 2>/dev/null
@@ -410,7 +410,7 @@ run_noninteractive() {
 
 service_online_policy_direct() {
     PID="$1"
-    RESPONSE=$(api_call GET "$API/online/policy/$PID")
+    api_call GET "$API/online/policy/$PID" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Policy $PID" || exit 1
     create_response_dir
     render_feature_table "$RESPONSE"
@@ -420,7 +420,7 @@ service_online_policy_direct() {
 
 service_online_claim_direct() {
     CID="$1"
-    RESPONSE=$(api_call GET "$API/online/claim/$CID")
+    api_call GET "$API/online/claim/$CID" > "/tmp/featsrv_resp_$$" && RESPONSE=$(cat "/tmp/featsrv_resp_$$"); rm -f "/tmp/featsrv_resp_$$"
     check_status "$HTTP_STATUS" "Claim $CID" || exit 1
     create_response_dir
     render_feature_table "$RESPONSE"
