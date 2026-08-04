@@ -2124,7 +2124,7 @@ document.querySelectorAll('#importance-model-toggle button').forEach(btn => {
 function renderActivityTable() {
   const tbody = document.getElementById('activity-tbody');
   tbody.innerHTML = '<tr><td colspan="5">Loading real activity…</td></tr>';
-  fetch('static/data/activity.json')
+  fetch('/static/data/activity.json')
     .then(r => r.json())
     .then(data => {
       tbody.innerHTML = '';
@@ -2251,7 +2251,7 @@ function renderPitTable() {
   const tbody = document.getElementById('pit-tbody');
   const rowCountEl = document.getElementById('pit-rowcount');
   tbody.innerHTML = '<tr><td colspan="7">Loading PIT data…</td></tr>';
-  fetch('static/data/pit_training.json')
+  fetch('/static/data/pit_training.json')
     .then(r => r.json())
     .then(data => {
       tbody.innerHTML = '';
@@ -2278,7 +2278,7 @@ function renderPitTable() {
 function renderBatchTable() {
   const tbody = document.getElementById('batch-tbody');
   tbody.innerHTML = '<tr><td colspan="6">Loading batch data…</td></tr>';
-  fetch('static/data/batch_offline.json')
+  fetch('/static/data/batch_offline.json')
     .then(r => r.json())
     .then(data => {
       tbody.innerHTML = '';
@@ -2337,7 +2337,7 @@ function initOnlineLookups() {
   function doPolicyLookup() {
     const id = document.getElementById('policy-input').value.trim() || 'POL-0000';
     // Fetch real data from static file (fallback to synthetic if not found)
-    fetch('static/data/policy_lookup.json')
+    fetch('/static/data/policy_lookup.json')
       .then(r => r.json())
       .then(data => {
         renderEntityResult('policy-result-tbody', data);
@@ -2350,7 +2350,7 @@ function initOnlineLookups() {
 
   function doClaimLookup() {
     const id = document.getElementById('claim-input').value.trim() || 'CLM-00000';
-    fetch('static/data/claim_lookup.json')
+    fetch('/static/data/claim_lookup.json')
       .then(r => r.json())
       .then(data => {
         renderEntityResult('claim-result-tbody', data);
