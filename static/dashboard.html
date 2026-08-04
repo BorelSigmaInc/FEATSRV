@@ -2123,20 +2123,28 @@ document.querySelectorAll('#importance-model-toggle button').forEach(btn => {
    ============================================================ */
 function renderActivityTable() {
   const tbody = document.getElementById('activity-tbody');
-  tbody.innerHTML = '';
-  activityLog.forEach(row => {
-    const tr = document.createElement('tr');
-    const statusTag = row.status === 200
-      ? '<span class="tag green">200</span>'
-      : (row.status >= 500 ? '<span class="tag red">' + row.status + '</span>' : '<span class="tag gray">' + row.status + '</span>');
-    tr.innerHTML =
-      '<td>' + row.ts.toISOString().slice(0, 19).replace('T', ' ') + '</td>' +
-      '<td>' + row.service + '</td>' +
-      '<td>' + row.entity + '</td>' +
-      '<td>' + statusTag + '</td>' +
-      '<td class="cell-num">' + row.latency + 'ms</td>';
-    tbody.appendChild(tr);
-  });
+  tbody.innerHTML = '<tr><td colspan="5">Loading real activity…</td></tr>';
+  fetch('static/data/activity.json')
+    .then(r => r.json())
+    .then(data => {
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        const statusTag = row.status === 200
+          ? '<span class="tag green">200</span>'
+          : (row.status >= 500 ? '<span class="tag red">' + row.status + '</span>' : '<span class="tag gray">' + row.status + '</span>');
+        tr.innerHTML =
+          '<td>' + row.timestamp + '</td>' +
+          '<td>' + row.service + '</td>' +
+          '<td>' + row.entity + '</td>' +
+          '<td>' + statusTag + '</td>' +
+          '<td class="cell-num">' + row.latency + 'ms</td>';
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(() => {
+      tbody.innerHTML = '<tr><td colspan="5">Could not load activity data.</td></tr>';
+    });
 }
 
 function renderServiceMix() {
@@ -2240,38 +2248,55 @@ function renderLeakageTable() {
 }
 
 function renderPitTable() {
-  bindSortableTable({
-    tbodyId: 'pit-tbody',
-    theadSelector: '#pit-table thead th',
-    data: pitRows,
-    searchInputId: 'pit-search',
-    searchKeys: ['claim_id', 'policy_id'],
-    rowCountId: 'pit-rowcount',
-    limit: 60,
-    columns: [
-      { key: 'claim_id' }, { key: 'policy_id' }, { key: 'event_timestamp' }, { key: 'feature_timestamp' },
-      { key: 'claim_severity_score', num: true },
-      { key: 'prior_claims_24m', num: true },
-      { key: 'label_charge_off', num: true, fmt: v => v === 1 ? '<span class="tag red">1</span>' : '0' }
-    ]
-  });
-  document.getElementById('pit-footer-count').textContent = fmtInt(pitRows.length) + ' total rows in payload';
+  const tbody = document.getElementById('pit-tbody');
+  const rowCountEl = document.getElementById('pit-rowcount');
+  tbody.innerHTML = '<tr><td colspan="7">Loading PIT data…</td></tr>';
+  fetch('static/data/pit_training.json')
+    .then(r => r.json())
+    .then(data => {
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + r.claim_id + '</td>' +
+          '<td>' + r.policy_id + '</td>' +
+          '<td>' + r.event_timestamp + '</td>' +
+          '<td>' + (r.feature_timestamp || '') + '</td>' +
+          '<td class="cell-num">' + (r.claim_severity_score || '—') + '</td>' +
+          '<td class="cell-num">' + (r.prior_claims_24m || '—') + '</td>' +
+          '<td class="cell-num">' + (r.fraud_flag === 1 ? '<span class="tag red">1</span>' : '0') + '</td>';
+        tbody.appendChild(tr);
+      });
+      rowCountEl.textContent = data.length + ' rows';
+      document.getElementById('pit-footer-count').textContent = data.length + ' total rows in payload';
+    })
+    .catch(() => {
+      tbody.innerHTML = '<tr><td colspan="7">Could not load PIT data.</td></tr>';
+    });
 }
 
 function renderBatchTable() {
   const tbody = document.getElementById('batch-tbody');
-  tbody.innerHTML = '';
-  batchRows.forEach(r => {
-    const tr = document.createElement('tr');
-    tr.innerHTML =
-      '<td>' + r.entity_id + '</td>' +
-      '<td>' + r.entity_type + '</td>' +
-      '<td class="cell-num">' + r.telematics_score + '</td>' +
-      '<td class="cell-num">' + r.credit_band + '</td>' +
-      '<td class="cell-num">' + r.exposure_months + '</td>' +
-      '<td>' + r.region + '</td>';
-    tbody.appendChild(tr);
-  });
+  tbody.innerHTML = '<tr><td colspan="6">Loading batch data…</td></tr>';
+  fetch('static/data/batch_offline.json')
+    .then(r => r.json())
+    .then(data => {
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + r.entity_id + '</td>' +
+          '<td>' + r.entity_type + '</td>' +
+          '<td class="cell-num">' + (r.telematics_score || r.claim_amount || '—') + '</td>' +
+          '<td class="cell-num">' + (r.credit_band || '—') + '</td>' +
+          '<td class="cell-num">' + (r.exposure_months || '—') + '</td>' +
+          '<td>' + (r.region || r.policy_id || '—') + '</td>';
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(() => {
+      tbody.innerHTML = '<tr><td colspan="6">Could not load batch data.</td></tr>';
+    });
 }
 
 /* ============================================================
@@ -2289,15 +2314,14 @@ function renderEntityResult(tbodyId, entity) {
 }
 
 function initOnlineLookups() {
-  const recentPolicies = Array.from({ length: 6 }, () => 'POL-' + randInt(1000, 9999));
-  const recentClaims = Array.from({ length: 6 }, () => 'CLM-' + randInt(10000, 99999));
+  // Recent IDs (static demo list, same as before)
+  const recentPolicies = ['POL-0000','POL-0001','POL-0002','POL-0003','POL-0004','POL-0005'];
+  const recentClaims   = ['CLM-00000','CLM-00001','CLM-00002','CLM-00003','CLM-00004','CLM-00005'];
 
   const policyRecentEl = document.getElementById('policy-recent');
   recentPolicies.forEach(id => {
     const chip = document.createElement('button');
-    chip.className = 'tag gray';
-    chip.style.cursor = 'pointer';
-    chip.textContent = id;
+    chip.className = 'tag gray'; chip.style.cursor = 'pointer'; chip.textContent = id;
     chip.addEventListener('click', () => { document.getElementById('policy-input').value = id; doPolicyLookup(); });
     policyRecentEl.appendChild(chip);
   });
@@ -2305,20 +2329,35 @@ function initOnlineLookups() {
   const claimRecentEl = document.getElementById('claim-recent');
   recentClaims.forEach(id => {
     const chip = document.createElement('button');
-    chip.className = 'tag gray';
-    chip.style.cursor = 'pointer';
-    chip.textContent = id;
+    chip.className = 'tag gray'; chip.style.cursor = 'pointer'; chip.textContent = id;
     chip.addEventListener('click', () => { document.getElementById('claim-input').value = id; doClaimLookup(); });
     claimRecentEl.appendChild(chip);
   });
 
   function doPolicyLookup() {
     const id = document.getElementById('policy-input').value.trim() || 'POL-0000';
-    renderEntityResult('policy-result-tbody', buildOnlineEntity(id, false));
+    // Fetch real data from static file (fallback to synthetic if not found)
+    fetch('static/data/policy_lookup.json')
+      .then(r => r.json())
+      .then(data => {
+        renderEntityResult('policy-result-tbody', data);
+      })
+      .catch(() => {
+        // fallback if fetch fails (e.g. offline)
+        renderEntityResult('policy-result-tbody', buildOnlineEntity(id, false));
+      });
   }
+
   function doClaimLookup() {
     const id = document.getElementById('claim-input').value.trim() || 'CLM-00000';
-    renderEntityResult('claim-result-tbody', buildOnlineEntity(id, true));
+    fetch('static/data/claim_lookup.json')
+      .then(r => r.json())
+      .then(data => {
+        renderEntityResult('claim-result-tbody', data);
+      })
+      .catch(() => {
+        renderEntityResult('claim-result-tbody', buildOnlineEntity(id, true));
+      });
   }
 
   document.getElementById('policy-lookup-btn').addEventListener('click', doPolicyLookup);
@@ -2326,6 +2365,7 @@ function initOnlineLookups() {
   document.getElementById('policy-input').addEventListener('keydown', e => { if (e.key === 'Enter') doPolicyLookup(); });
   document.getElementById('claim-input').addEventListener('keydown', e => { if (e.key === 'Enter') doClaimLookup(); });
 
+  // Initial load
   doPolicyLookup();
   doClaimLookup();
 }
