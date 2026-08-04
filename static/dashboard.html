@@ -1911,6 +1911,7 @@ function renderRiskLine() {
 
 /* -------- slider interaction -------- */
 function initRiskSlider() {
+  if (!document.getElementById("range-track-wrap")) return;
   const trackWrap = document.getElementById('range-track-wrap');
   const fill = document.getElementById('range-fill');
   const loHandle = document.getElementById('range-handle-lo');
