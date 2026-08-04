@@ -17,6 +17,7 @@
 \usepackage{titlesec}
 \usepackage{enumitem}
 \usepackage{tabularx}
+\usepackage{adjustbox}
 \usepackage[expansion=false]{microtype}
 \usepackage{setspace}
 \usepackage{url}
@@ -346,11 +347,20 @@ Table~\ref{tab:api} lists the REST surface exposed by the serving layer.
 \subsection{Leakage Prevention Validation}
 We constructed a scenario where a policyholder moves house, and we queried the feature store for the address at two different dates - before and after the move.
 The Feast point-in-time join correctly returned the old address for the earlier date and the new address for the later date, with zero leakage (Figure~\ref{fig:pit}).
+Figure~\ref{fig:lineage} shows how the dashboard visualises the same guarantee as a source-to-consumer lineage: the point-in-time store is the single write path for both online and offline consumers.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/dashboard/dash_lineage.png}
+\caption{Dashboard Data Lineage panel: Sankey flow from actuarial sources through the PIT / Redis stores to underwriting, pricing, fraud, and reporting consumers (exported from \texttt{static/dashboard.html}).}
+\label{fig:lineage}
+\end{figure}
 
 \subsection{Performance}
 Online policy lookups via Redis averaged $<10$\,ms latency on the deployed virtual private server.
 Offline PIT joins on 1{,}000 claims completed in under 2 seconds using Feast's local Dask engine and under 5 seconds with PySpark.
 Table~\ref{tab:perf} summarises these measurements.
+Figure~\ref{fig:latency} aggregates mean latency by service from the dashboard activity export (\texttt{static/data/activity.json}).
 
 \begin{table}[ht]
 \centering
@@ -367,9 +377,101 @@ Table~\ref{tab:perf} summarises these measurements.
 \end{tabular}
 \end{table}
 
-\subsection{Dashboard}
-The browser dashboard loads real data from static JSON files and renders it in interactive tables and charts.
-The \textbf{Save as PDF} button generates a timestamped report suitable for regulatory filings.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/dashboard/chart_latency_by_service.png}
+\caption{Mean latency by service computed from the dashboard activity JSON (CLI sessions mirrored under \texttt{Response-FEATSRV/}).}
+\label{fig:latency}
+\end{figure}
+
+\subsection{Dashboard Outputs}
+The browser dashboard loads real artefacts from \texttt{static/data/} and renders interactive tables and charts (Overview, Lineage, Risk \& Leakage, Feature Importance, Training \& Batch, Online Lookups).
+Figure~\ref{fig:overview} shows the Overview panel: request-volume cut-over, recent CLI activity, and 24\,h service mix.
+Figure~\ref{fig:risk} is the Risk \& Leakage Audit panel; Figure~\ref{fig:importance} is Feature Importance; Figure~\ref{fig:training} is the PIT training / batch preview backed by \texttt{pit\_training.json} and \texttt{batch\_offline.json}.
+Online Redis lookups for \texttt{POL-0000} / \texttt{CLM-00000} are summarised in Figure~\ref{fig:online} and Table~\ref{tab:online}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/dashboard/dash_overview.png}
+\caption{FEATSRV console Overview: online request volume before/after the Jan~2024 real-time cut-over, recent CLI activity, and service call mix (panel capture from \texttt{static/dashboard.html}).}
+\label{fig:overview}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/dashboard/dash_risk.png}
+\caption{Risk \& Leakage Audit panel: portfolio leakage risk, entity risk-score distribution, and open audit findings.}
+\label{fig:risk}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/dashboard/dash_importance.png}
+\caption{Feature importance summary panel (underwriting model ranking) as rendered by the console.}
+\label{fig:importance}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.88\textwidth]{figures/dashboard/chart_feature_importance_fraud.png}
+\caption{Fraud-model feature importance exported from the Nimbus FI pack consumed by the dashboard/CLI.}
+\label{fig:fi-fraud}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/dashboard/dash_training.png}
+\caption{Training \& Batch Sets panel: point-in-time training preview and last offline batch payload from static JSON exports.}
+\label{fig:training}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/dashboard/chart_online_lookups.png}
+\caption{Online lookup outputs for policy \texttt{POL-0000} and claim \texttt{CLM-00000} (\texttt{static/data/policy\_lookup.json}, \texttt{claim\_lookup.json}).}
+\label{fig:online}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Sample online feature payloads mirrored by the dashboard.}
+\label{tab:online}
+\begin{tabular}{@{}cll@{}}
+\toprule
+\textbf{No.} & \textbf{Field} & \textbf{Value} \\
+\midrule
+\multicolumn{3}{@{}l@{}}{\textit{Policy lookup (POL-0000)}} \\
+1 & initial\_premium & 936.72 \\
+2 & region & WI \\
+3 & address & 14323 Richardson Skyway Suite 157 \\
+4 & inception\_date & 2024-10-21 \\
+\midrule
+\multicolumn{3}{@{}l@{}}{\textit{Claim lookup (CLM-00000)}} \\
+5 & claim\_amount & 460.94 \\
+6 & fraud\_flag & 0 \\
+7 & policy\_id & POL-0227 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{First rows of the dashboard PIT training export (\texttt{static/data/pit\_training.json}).}
+\label{tab:pitrows}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllrrr@{}}
+\toprule
+\textbf{No.} & \textbf{claim\_id} & \textbf{policy\_id} & \textbf{event\_timestamp} & \textbf{premium} & \textbf{claim\_amt} & \textbf{fraud} \\
+\midrule
+1 & CLM-00000 & POL-0227 & 2025-09-04 & 968.27 & 460.94 & 0 \\
+2 & CLM-00001 & POL-0199 & 2025-08-22 & 1625.79 & 8638.93 & 0 \\
+3 & CLM-00002 & POL-0020 & 2025-09-18 & 1340.15 & 5516.76 & 0 \\
+4 & CLM-00003 & POL-0010 & 2026-01-09 & 334.99 & 509.01 & 0 \\
+\bottomrule
+\end{tabular}%
+}
+
+\end{table}
 
 % ============================================================
 \section{User Guide}
@@ -395,11 +497,20 @@ The \textbf{Save as PDF} button generates a timestamped report suitable for regu
 
 \subsection{Using the Dashboard}
 \begin{enumerate}[leftmargin=1.6em]
-\item Open \texttt{https://featsrv.q-dit.com/static/dashboard.html} in a browser.
-\item Navigate through the tabs: Overview, Data Lineage, Risk \& Leakage Audit, Feature Importance, Training \& Batch Sets, Online Lookups.
+\item Open \texttt{https://featsrv.q-dit.com/static/dashboard.html} (or \texttt{static/dashboard.html} via a local static server) in a browser.
+\item Navigate through the tabs: Overview, Data Lineage, Risk \& Leakage Audit, Feature Importance, Training \& Batch Sets, Online Lookups (Figures~\ref{fig:overview}--\ref{fig:online}).
 \item In the \textbf{Online Lookups} tab, enter a policy ID (e.g., \texttt{POL-0000}) or claim ID (e.g., \texttt{CLM-00000}) and click \textbf{Look up}.
 \item Use the \textbf{Save as PDF} button to print a timestamped report.
 \end{enumerate}
+
+Console KPI strip from the same session is shown in Figure~\ref{fig:kpis}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{figures/dashboard/00_kpis.png}
+\caption{Dashboard KPI strip: system health, 24\,h request volume, open leakage flags, and PIT training rows generated.}
+\label{fig:kpis}
+\end{figure}
 
 \subsection{Using Nimbus Demo Data}
 All files are in the \texttt{Nimbus/} folder of the repository.
