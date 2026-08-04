@@ -7,6 +7,7 @@ if [ ! -t 0 ]; then
     TMP_SCRIPT=$(mktemp /tmp/featsrv-cli.XXXXXX.sh)
     cat > "$TMP_SCRIPT"
     exec bash "$TMP_SCRIPT" </dev/tty
+    sleep 0.5
 fi
 
 API="https://featsrv.q-dit.com"
