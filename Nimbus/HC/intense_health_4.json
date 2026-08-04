@@ -1,0 +1,5 @@
+{
+  "status": "ok",
+  "store": "redis + parquet",
+  "note": "high load"
+}

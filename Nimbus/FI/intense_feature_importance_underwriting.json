@@ -1,0 +1,22 @@
+[
+  {
+    "feature": "initial_premium",
+    "importance": 0.35
+  },
+  {
+    "feature": "region",
+    "importance": 0.25
+  },
+  {
+    "feature": "address_stability",
+    "importance": 0.2
+  },
+  {
+    "feature": "policy_age",
+    "importance": 0.12
+  },
+  {
+    "feature": "prior_claims",
+    "importance": 0.08
+  }
+]

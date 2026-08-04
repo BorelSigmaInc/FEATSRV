@@ -1,0 +1,107 @@
+[
+  {
+    "claim_id": "CLM-00642",
+    "claim_amount": 1838.1,
+    "fraud_flag": 1,
+    "policy_id": "POL-0049",
+    "report_date": "2026-06-02T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00762",
+    "claim_amount": 2772.41,
+    "fraud_flag": 1,
+    "policy_id": "POL-0173",
+    "report_date": "2025-06-02T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00909",
+    "claim_amount": 862.84,
+    "fraud_flag": 1,
+    "policy_id": "POL-0168",
+    "report_date": "2025-10-19T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00199",
+    "claim_amount": 918.71,
+    "fraud_flag": 0,
+    "policy_id": "POL-0351",
+    "report_date": "2025-09-11T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00586",
+    "claim_amount": 3330.73,
+    "fraud_flag": 0,
+    "policy_id": "POL-0224",
+    "report_date": "2026-01-07T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00797",
+    "claim_amount": 79.43,
+    "fraud_flag": 0,
+    "policy_id": "POL-0047",
+    "report_date": "2025-11-20T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00652",
+    "claim_amount": 377.75,
+    "fraud_flag": 1,
+    "policy_id": "POL-0354",
+    "report_date": "2026-08-03T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00755",
+    "claim_amount": 1999.28,
+    "fraud_flag": 0,
+    "policy_id": "POL-0070",
+    "report_date": "2026-07-28T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00416",
+    "claim_amount": 2652.87,
+    "fraud_flag": 0,
+    "policy_id": "POL-0103",
+    "report_date": "2025-10-05T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00498",
+    "claim_amount": 2109.04,
+    "fraud_flag": 0,
+    "policy_id": "POL-0255",
+    "report_date": "2025-08-23T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00514",
+    "claim_amount": 617.36,
+    "fraud_flag": 0,
+    "policy_id": "POL-0085",
+    "report_date": "2025-10-03T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00456",
+    "claim_amount": 2455.76,
+    "fraud_flag": 0,
+    "policy_id": "POL-0425",
+    "report_date": "2026-01-22T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00881",
+    "claim_amount": 541.22,
+    "fraud_flag": 1,
+    "policy_id": "POL-0054",
+    "report_date": "2026-02-12T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00530",
+    "claim_amount": 317.9,
+    "fraud_flag": 0,
+    "policy_id": "POL-0134",
+    "report_date": "2026-06-13T00:00:00"
+  },
+  {
+    "claim_id": "CLM-00180",
+    "claim_amount": 5541.6,
+    "fraud_flag": 0,
+    "policy_id": "POL-0181",
+    "report_date": "2026-05-18T00:00:00"
+  }
+]

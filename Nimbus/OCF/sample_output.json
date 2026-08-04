@@ -1,0 +1,9 @@
+{
+  "entity_type": "claim",
+  "entity_id": "CLM-00000",
+  "features": {
+    "claim_amount": 460.94,
+    "fraud_flag": 0,
+    "policy_id": "POL-0050"
+  }
+}

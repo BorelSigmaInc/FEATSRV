@@ -1,0 +1,6 @@
+{
+  "total_rows": 5,
+  "leakage_detected": 2,
+  "leakage_percent": 40.0,
+  "status": "FAIL"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "feature": "claim_amount",
+    "importance": 0.3
+  },
+  {
+    "feature": "report_delay",
+    "importance": 0.25
+  },
+  {
+    "feature": "address_change_freq",
+    "importance": 0.2
+  },
+  {
+    "feature": "initial_premium",
+    "importance": 0.15
+  },
+  {
+    "feature": "region",
+    "importance": 0.1
+  }
+]

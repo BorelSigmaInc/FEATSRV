@@ -1,0 +1,18 @@
+[
+  {
+    "claim_id": "CLM-00001",
+    "policy_id": "POL-0492",
+    "event_timestamp": "2025-09-09T00:00:00",
+    "initial_premium": 771.55,
+    "address": "78523 Joseph Junction",
+    "claim_amount": 8638.93
+  },
+  {
+    "claim_id": "CLM-00000",
+    "policy_id": "POL-0050",
+    "event_timestamp": "2025-09-16T00:00:00",
+    "initial_premium": 1948.29,
+    "address": "326 Karen Glens",
+    "claim_amount": 460.94
+  }
+]

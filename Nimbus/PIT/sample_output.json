@@ -1,0 +1,9 @@
+{
+  "columns": ["claim_id","policy_id","event_timestamp","initial_premium","address","claim_amount","fraud_flag"],
+  "rows": [
+    {"claim_id":"CLM-00002","policy_id":"POL-0307","event_timestamp":"2025-02-07T00:00:00","initial_premium":849.03,"address":"959 Sanchez Summit","claim_amount":5516.76,"fraud_flag":0},
+    {"claim_id":"CLM-00001","policy_id":"POL-0492","event_timestamp":"2025-09-09T00:00:00","initial_premium":771.55,"address":"78523 Joseph Junction","claim_amount":8638.93,"fraud_flag":0},
+    {"claim_id":"CLM-00000","policy_id":"POL-0050","event_timestamp":"2025-09-16T00:00:00","initial_premium":1948.29,"address":"326 Karen Glens","claim_amount":460.94,"fraud_flag":0}
+  ],
+  "total_rows": 3
+}

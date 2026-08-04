@@ -1,0 +1,82 @@
+[
+  {
+    "policy_id": "POL-0129",
+    "initial_premium": 1168.27,
+    "region": "GA",
+    "current_address": "6605 Michael Path Apt. 956",
+    "inception_date": "2025-05-17T00:00:00",
+    "address_history_count": 2
+  },
+  {
+    "policy_id": "POL-0280",
+    "initial_premium": 1813.01,
+    "region": "AK",
+    "current_address": "82071 Schmitt Harbors",
+    "inception_date": "2025-04-30T00:00:00",
+    "address_history_count": 2
+  },
+  {
+    "policy_id": "POL-0440",
+    "initial_premium": 444.22,
+    "region": "NY",
+    "current_address": "656 Farmer Harbors Suite 756",
+    "inception_date": "2025-03-13T00:00:00",
+    "address_history_count": 1
+  },
+  {
+    "policy_id": "POL-0384",
+    "initial_premium": 1549.62,
+    "region": "ID",
+    "current_address": "6058 William Orchard",
+    "inception_date": "2024-09-28T00:00:00",
+    "address_history_count": 1
+  },
+  {
+    "policy_id": "POL-0225",
+    "initial_premium": 714.78,
+    "region": "AS",
+    "current_address": "59961 Jennifer Port",
+    "inception_date": "2025-05-05T00:00:00",
+    "address_history_count": 1
+  },
+  {
+    "policy_id": "POL-0416",
+    "initial_premium": 798.46,
+    "region": "MD",
+    "current_address": "806 Williams Route",
+    "inception_date": "2024-11-22T00:00:00",
+    "address_history_count": 2
+  },
+  {
+    "policy_id": "POL-0001",
+    "initial_premium": 1916.21,
+    "region": "VA",
+    "current_address": "58883 Powell Road",
+    "inception_date": "2025-03-03T00:00:00",
+    "address_history_count": 1
+  },
+  {
+    "policy_id": "POL-0435",
+    "initial_premium": 1491.65,
+    "region": "AR",
+    "current_address": "132 Mark Ford",
+    "inception_date": "2025-03-21T00:00:00",
+    "address_history_count": 2
+  },
+  {
+    "policy_id": "POL-0346",
+    "initial_premium": 1379.66,
+    "region": "FL",
+    "current_address": "9569 Allen Course Apt. 747",
+    "inception_date": "2024-09-10T00:00:00",
+    "address_history_count": 1
+  },
+  {
+    "policy_id": "POL-0314",
+    "initial_premium": 1721.17,
+    "region": "TX",
+    "current_address": "6428 Peters Springs Suite 629",
+    "inception_date": "2025-03-21T00:00:00",
+    "address_history_count": 1
+  }
+]

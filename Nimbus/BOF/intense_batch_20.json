@@ -1,0 +1,110 @@
+{
+  "entities": [
+    {
+      "claim_id": "CLM-00654",
+      "policy_id": "POL-0099",
+      "event_timestamp": "2026-02-02T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00114",
+      "policy_id": "POL-0411",
+      "event_timestamp": "2025-12-01T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00025",
+      "policy_id": "POL-0485",
+      "event_timestamp": "2026-05-23T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00759",
+      "policy_id": "POL-0282",
+      "event_timestamp": "2025-07-14T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00281",
+      "policy_id": "POL-0125",
+      "event_timestamp": "2025-02-02T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00250",
+      "policy_id": "POL-0469",
+      "event_timestamp": "2026-04-04T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00228",
+      "policy_id": "POL-0036",
+      "event_timestamp": "2026-07-09T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00142",
+      "policy_id": "POL-0130",
+      "event_timestamp": "2025-12-27T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00754",
+      "policy_id": "POL-0409",
+      "event_timestamp": "2026-01-22T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00104",
+      "policy_id": "POL-0288",
+      "event_timestamp": "2025-01-16T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00692",
+      "policy_id": "POL-0001",
+      "event_timestamp": "2026-02-19T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00758",
+      "policy_id": "POL-0268",
+      "event_timestamp": "2026-05-01T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00913",
+      "policy_id": "POL-0246",
+      "event_timestamp": "2025-10-13T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00558",
+      "policy_id": "POL-0096",
+      "event_timestamp": "2025-07-01T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00089",
+      "policy_id": "POL-0436",
+      "event_timestamp": "2025-11-19T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00604",
+      "policy_id": "POL-0163",
+      "event_timestamp": "2025-12-03T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00432",
+      "policy_id": "POL-0008",
+      "event_timestamp": "2026-04-30T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00032",
+      "policy_id": "POL-0403",
+      "event_timestamp": "2025-11-03T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00030",
+      "policy_id": "POL-0460",
+      "event_timestamp": "2024-12-25T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00095",
+      "policy_id": "POL-0350",
+      "event_timestamp": "2026-03-25T00:00:00"
+    }
+  ],
+  "features": [
+    "policy_features:initial_premium",
+    "address_features:address",
+    "claim_features:claim_amount",
+    "claim_features:fraud_flag"
+  ]
+}

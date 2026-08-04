@@ -1,0 +1,22 @@
+[
+  {
+    "feature": "initial_premium",
+    "importance": 0.4
+  },
+  {
+    "feature": "region",
+    "importance": 0.22
+  },
+  {
+    "feature": "address_stability",
+    "importance": 0.18
+  },
+  {
+    "feature": "policy_age",
+    "importance": 0.1
+  },
+  {
+    "feature": "vehicle_age",
+    "importance": 0.1
+  }
+]

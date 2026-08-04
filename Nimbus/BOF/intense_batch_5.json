@@ -1,0 +1,28 @@
+{
+  "entities": [
+    {
+      "claim_id": "CLM-00223",
+      "event_timestamp": "2025-03-30T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00238",
+      "event_timestamp": "2025-11-26T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00517",
+      "event_timestamp": "2025-12-15T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00616",
+      "event_timestamp": "2025-08-05T00:00:00"
+    },
+    {
+      "claim_id": "CLM-00027",
+      "event_timestamp": "2025-09-26T00:00:00"
+    }
+  ],
+  "features": [
+    "claim_features:claim_amount",
+    "claim_features:fraud_flag"
+  ]
+}
