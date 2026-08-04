@@ -19,7 +19,7 @@ async def lifespan(app: FastAPI):
     store = FeatureStore(repo_path=".")
     yield
 
-app = FastAPI(title="FEATSRV — Point‑in‑Time Feature Serving API", lifespan=lifespan)
+app = FastAPI(title="FEATSRV - Point-in-Time Feature Serving API", lifespan=lifespan)
 
 # Mount static files for CLI script
 app.mount("/static", StaticFiles(directory="static"), name="static")

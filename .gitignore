@@ -7,3 +7,7 @@ logs/
 nohup.out
 .DS_Store
 *.db-journal
+docs/*.aux
+docs/*.out
+docs/*.toc
+docs/*.synctex.gz

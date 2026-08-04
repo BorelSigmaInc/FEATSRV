@@ -3,27 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FEATSRV — Feature Serving Console</title>
+<title>FEATSRV - Feature Serving Console</title>
 <style>
 
 /* ============================================================
-   FEATSRV CONSOLE — DESIGN TOKENS
-   House style: IBM Carbon Design System (Borel Sigma Inc. standard)
-   Palette (strict, four-color + status pair):
+   FEATSRV CONSOLE - DESIGN TOKENS
+   Borel Sigma Inc. console palette (four-color + status pair):
      --blue-60   #0f62fe   primary / interactive
      --gray-100  #161616   shell / dark surface
      --gray-10   #f4f4f4   light surface
      --white     #ffffff   inverse text / panels
      --green-40  #24a148   status: healthy / positive delta
      --red-50    #da1e28   status: risk / negative delta
-   Type: IBM Plex Sans (UI), IBM Plex Mono (data, ids, code)
-   Radius: 0 everywhere. No decorative icons — labels and glyphs only.
+   Type: Helvetica Neue / Arial (UI), SFMono / Consolas (data, ids, code)
+   Radius: 0 everywhere. No decorative icons - labels and glyphs only.
    ============================================================ */
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  src: local('IBM Plex Sans');
-}
 
 :root {
   --blue-60: #0f62fe;
@@ -44,8 +38,8 @@
   --red-50: #da1e28;
   --red-10: #fff1f1;
 
-  --font-ui: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-ui: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 
   --sp-01: 2px;
   --sp-02: 4px;
@@ -2406,7 +2400,7 @@ if (document.readyState === 'loading') {
   initDashboard();
 }
 </script>
-<button onclick="window.print()" style="position:fixed; bottom:20px; right:20px; z-index:1000; padding:10px 16px; background:#0f62fe; color:#fff; border:none; cursor:pointer; font-family:'IBM Plex Sans'; font-size:13px;">
+<button onclick="window.print()" style="position:fixed; bottom:20px; right:20px; z-index:1000; padding:10px 16px; background:#0f62fe; color:#fff; border:none; cursor:pointer; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; font-size:13px;">
   🖨 Save as PDF
 </button>
 </body>
