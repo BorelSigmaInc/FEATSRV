@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Early definition to avoid re-exec timing issues
+confirm() {
+    local prompt="$1"
+    read -r -p "$prompt (y/N): " reply
+    [[ "$reply" =~ ^[Yy] ]]
+}
+
 # ==============================================================================
 #  FEATSRV — Point-in-Time Feature Serving CLI
 #  A terminal client for the FEATSRV actuarial feature store API.
